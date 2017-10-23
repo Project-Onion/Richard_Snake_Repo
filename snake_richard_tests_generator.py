@@ -135,8 +135,8 @@ def main(_):
     amountOfMiniBatchFilesToTrain = 70
     amountOfMiniBatchFilesToValidate = 1
     amountOfMiniBatchFilesToTest = 30 #was 20
-    starting_learning_rate = 1e-3
-    mini_batch_size = 500
+    starting_learning_rate = 1e-3  #was 1e-4
+    mini_batch_size = 400   #was 500
     numEpochs = 20
     dataFileNumber = 5 #was 3
     innerFolder = ""
