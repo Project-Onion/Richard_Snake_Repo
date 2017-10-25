@@ -132,12 +132,12 @@ def main(_):
 
     startTime = time.time()
 
-    amountOfMiniBatchFilesToTrain = 70
+    amountOfMiniBatchFilesToTrain = 50
     amountOfMiniBatchFilesToValidate = 1
-    amountOfMiniBatchFilesToTest = 30 #was 20
+    amountOfMiniBatchFilesToTest = 10 #was 20
     starting_learning_rate = 1e-3  #was 1e-4
-    mini_batch_size = 400   #was 500
-    numEpochs = 20
+    mini_batch_size = 800   #was 500
+    numEpochs = 10
     dataFileNumber = 5 #was 3
     innerFolder = ""
 
@@ -253,7 +253,7 @@ def main(_):
         sys.stdout.flush()
         sumOfTests = 0
         amountOfTests = 0
-        for i in range(0, amountOfMiniBatchFilesToTest):
+        for i in range(1, amountOfMiniBatchFilesToTest):
             batchData = [np.load(fileLocation + "testData/" + innerFolder + 'testDataBoards' + str(i) + ".npy"),
                          np.load(fileLocation + "testData/" + innerFolder + 'testDataMoves' + str(i) + ".npy")]
 #            amountOfTests = 0

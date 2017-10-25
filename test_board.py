@@ -24,6 +24,7 @@ import time
 # 	#print ("index: " + str(indexArray[num]))
 
 def drawBoard(boards, move, num):#indexArray, num):
+	print("")
 	row = 1
 	column = 0
 	head=(-1,-1)
@@ -37,11 +38,12 @@ def drawBoard(boards, move, num):#indexArray, num):
 			if boards[num][i]==4:
 				head=(row,column)
 
-		if (i%52==0 and i!=0):
+		if (i%52==51):
 			row = row + 1
 			column = 0
 			print("")
 
+	print("")
 	print("-------------------------------------------------------------")
 	print("head: " + str(head))
 	print ("move: "+ str(move[num]))
