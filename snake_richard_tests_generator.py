@@ -132,13 +132,13 @@ def main(_):
 
     startTime = time.time()
 
-    amountOfMiniBatchFilesToTrain = 50
+    amountOfMiniBatchFilesToTrain = 40
     amountOfMiniBatchFilesToValidate = 1
     amountOfMiniBatchFilesToTest = 10 #was 20
     starting_learning_rate = 1e-3  #was 1e-4
-    mini_batch_size = 800   #was 500
+    mini_batch_size = 500   #was 500
     numEpochs = 10
-    dataFileNumber = 5 #was 3
+    dataFileNumber = 6 #was 3, then 5
     innerFolder = ""
 
     print("amountOfMiniBatchFilesToTrain: " + str(amountOfMiniBatchFilesToTrain))

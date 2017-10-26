@@ -29,6 +29,7 @@ tf.app.flags.DEFINE_integer('training_iteration', 1,
 tf.app.flags.DEFINE_integer('model_version', 1, 'version number of the model.')
 tf.app.flags.DEFINE_string('work_dir', '/home/student/Desktop/', 'Working directory.')
 FLAGS = tf.app.flags.FLAGS
+
 #
 # def deepnn(x):
 #     with tf.name_scope('reshape'):
@@ -116,6 +117,20 @@ FLAGS = tf.app.flags.FLAGS
     # Add ops to save and restore all the variables.
 
 
+
+
+def drawBoard(board):
+    for i in range(2704):
+        if board[i] == 0:
+            print(" ", end=" ")
+        else:
+            print(board[i], end=" ")
+
+        if (i%52==51):
+            print("")
+
+
+
 with tf.Session() as sess:
     #sess.run(tf.global_variables_initializer())
     #saver = tf.train.Saver()
@@ -124,13 +139,16 @@ with tf.Session() as sess:
     # saver.restore(sess, tf.train.latest_checkpoint('./'))
     #saver.restore(sess, import_path)
 
-    saver = tf.train.import_meta_graph('models/good_models/SLR_sphered/20171021120723/output_snake_model_20171021_171335.meta')
-    saver.restore(sess, tf.train.latest_checkpoint('models/good_models/SLR_sphered/20171021120723/SLR_sphered/'))
+    #saver = tf.train.import_meta_graph('/mnt/snake/snakeNN/snakeNN_code/models/good_models/LR_sphered/20171020_191431/output_snake_model_20171020_191431.meta')
+    #saver.restore(sess, tf.train.latest_checkpoint('/mnt/snake/snakeNN/snakeNN_code/models/good_models/LR_sphered/20171020_191431/'))
+    saver = tf.train.import_meta_graph('/mnt/snake/snakeNN/snakeNN_code/models/good_models/SLR_sphered/20171021120723/output_snake_model_20171021_171335.meta')
+    saver.restore(sess, tf.train.latest_checkpoint('/mnt/snake/snakeNN/snakeNN_code/models/good_models/SLR_sphered/20171021120723/'))
     # saver.restore(sess,"output_snake_model.data-00000-of-00001")
-
+    
+    print("setting up graph variables...")
     graph = tf.get_default_graph()
     x = graph.get_tensor_by_name("x:0")
-    # y_ = graph.get_tensor_by_name("y_:0")
+    y_ = graph.get_tensor_by_name("y:0")
     keep_prob = graph.get_tensor_by_name("keep_prob:0")
 
     result_argmax = graph.get_tensor_by_name("result_argmax:0")
@@ -143,6 +161,7 @@ with tf.Session() as sess:
         print("Connection established from " + str(addr))
         mapReceived = ''
         expectedTotalData = connectSocket.recv(5)
+        startTime = time.time()
         if expectedTotalData:
             #print ("Expected total data size: " + expectedTotalData)
             expectedTotalData = int(expectedTotalData)
@@ -164,9 +183,14 @@ with tf.Session() as sess:
             continue
 
         #print("mapReceived before pickle loads: " + str(mapReceived))
-        map = pickle.loads(mapReceived)
+        board = pickle.loads(mapReceived)
         #print("Received map, sending it through deepnn")
-        result_arr = sess.run(result_argmax, feed_dict={x: map.reshape(1,2704), keep_prob: 1.0})
+#        result_arr = sess.run(result_argmax, feed_dict={x: boardMap.reshape(1,2704), keep_prob: 1.0})
+
+	boardArr = np.array([board])
+        result_arr = sess.run(result_argmax, feed_dict={
+            x: boardArr,
+            keep_prob: 1.0})
         # answer = result.eval(feed_dict={x: map.reshape(1,2704)})
         # result = tf.argmax(deepnn(map),axis=0, output_type=tf.int32)
         result = str(result_arr[0] + 4)
@@ -174,6 +198,8 @@ with tf.Session() as sess:
         # returnResult = pickle.dumps(result)
         # print("Sending result to client...")
         connectSocket.send(result)
+        #drawBoard(boardArr[0])
+	print("time for move: " + str(time.time() - startTime) + " seconds. answer was: " + str(result_arr))
         # print("Done serving client, reseting for new client")
 
     print("Done sending. Closing Connection...")

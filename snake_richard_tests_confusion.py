@@ -122,13 +122,13 @@ def main(_):
 
     startTime = time.time()
 
-    amountOfMiniBatchFilesToTrain = 90
+    amountOfMiniBatchFilesToTrain = 1#90
     amountOfMiniBatchFilesToValidate = 1
-    amountOfMiniBatchFilesToTest = 30
+    amountOfMiniBatchFilesToTest = 1#30
     starting_learning_rate = 5*1e-4
     mini_batch_size = 500
-    numEpochs = 5
-    dataFileNumber = 2
+    numEpochs = 1#5
+    dataFileNumber = 5
     innerFolder = ""
 
     print("amountOfMiniBatchFilesToTrain: " + str(amountOfMiniBatchFilesToTrain))
@@ -152,9 +152,14 @@ def main(_):
         keep_prob = tf.placeholder(tf.float32, name="keep_prob")
         # Build the graph for the deep net
         # y_conv, keep_prob, regularizer = deepnn(x) # with l2 regularization
-        y_conv, keep_prob= deepnn(x, keep_prob)
+#	tf.add(x,0,name="x_check")
+	y_conv, keep_prob= deepnn(x, keep_prob)
+#        tf.add(y_conv,0,name="y_conv")
 
         tf.argmax(y_conv, 1, output_type=tf.int32, name="result_argmax")
+#        tf.argmax(y_conv, 0, output_type=tf.int32, name="result_argmax2")
+#        tf.argmax(y_conv, 1, name="result_argmax3")
+#        tf.argmax(y_conv, 0, name="result_argmax4")
 
         with tf.name_scope('loss'):
             #cross_entropy = tf.nn.softmax_cross_entropy_with_logits(labels=y_,logits=y_conv)
