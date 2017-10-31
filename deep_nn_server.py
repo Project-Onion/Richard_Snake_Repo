@@ -30,6 +30,8 @@ tf.app.flags.DEFINE_integer('model_version', 1, 'version number of the model.')
 tf.app.flags.DEFINE_string('work_dir', '/home/student/Desktop/', 'Working directory.')
 FLAGS = tf.app.flags.FLAGS
 
+
+logFile = open("/mnt/snake/snakeNN/snakeNN_code/server_logs/server_output_" + str(datetime.datetime.now().strftime("%Y%m%d_%H%M%S")) + ".log", 'w')
 #
 # def deepnn(x):
 #     with tf.name_scope('reshape'):
@@ -122,14 +124,31 @@ FLAGS = tf.app.flags.FLAGS
 def drawBoard(board):
     for i in range(2704):
         if board[i] == 0:
-            print(" ", end=" ")
+#            print(" ", end=" ")
+            logFile.write("  ")
         else:
-            print(board[i], end=" ")
+#            print(board[i], end=" ")
+            logFile.write(str(board[i]) + " ")
 
         if (i%52==51):
-            print("")
+#            print("")
+            logFile.write("\n")
 
+"""
+def boardSplitter(board):
+    return [np.array([[pixel if (pixel == 1 or pixel == 2) else 0, pixel if (pixel == 4) else 0, pixel if (pixel == 5 or pixel == 6) else 0] for pixel in board]).flatten()]
 
+def boardSplitter(board):
+    return [np.array([[pixel if (pixel == 1 or pixel == 2) else 0 for pixel in board], [pixel if (pixel == 4) else 0 for pixel in board], [pixel if (pixel == 5 or pixel == 6) else 0 for pixel in board]]).flatten()]
+"""
+
+def boardSplitter(board):
+    return [np.array([[pixel if (pixel == 1 or pixel == 2 or pixel == 3) else 0 for pixel in board], [pixel if (pixel == 4 or pixel ==5) else 0 for pixel in board], [pixel if (pixel == 6 or pixel == 7) else 0 for pixel in board], [pixel for pixel in board]]).flatten()]
+
+"""
+def boardSplitter(board):
+    return [np.array([[pixel if (pixel == 1 or pixel == 2) else 0 for pixel in board], [pixel if (pixel == 3 or pixel == 4) else 0 for pixel in board], [pixel if (pixel == 5 or pixel == 6) else 0 for pixel in board]]).flatten()]
+"""
 
 with tf.Session() as sess:
     #sess.run(tf.global_variables_initializer())
@@ -141,9 +160,18 @@ with tf.Session() as sess:
 
     #saver = tf.train.import_meta_graph('/mnt/snake/snakeNN/snakeNN_code/models/good_models/LR_sphered/20171020_191431/output_snake_model_20171020_191431.meta')
     #saver.restore(sess, tf.train.latest_checkpoint('/mnt/snake/snakeNN/snakeNN_code/models/good_models/LR_sphered/20171020_191431/'))
-    saver = tf.train.import_meta_graph('/mnt/snake/snakeNN/snakeNN_code/models/good_models/SLR_sphered/20171021120723/output_snake_model_20171021_171335.meta')
-    saver.restore(sess, tf.train.latest_checkpoint('/mnt/snake/snakeNN/snakeNN_code/models/good_models/SLR_sphered/20171021120723/'))
-    # saver.restore(sess,"output_snake_model.data-00000-of-00001")
+#    saver = tf.train.import_meta_graph('/mnt/snake/snakeNN/snakeNN_code/models/good_models/SLR_sphered/20171021120723/output_snake_model_20171021_171335.meta')
+#    saver.restore(sess, tf.train.latest_checkpoint('/mnt/snake/snakeNN/snakeNN_code/models/good_models/SLR_sphered/20171021120723/'))
+#    saver = tf.train.import_meta_graph('/mnt/snake/snakeNN/snakeNN_code/models/output_snake_model_20171026_110041.meta')
+#    saver.restore(sess, tf.train.latest_checkpoint('/mnt/snake/snakeNN/snakeNN_code/models/'))
+
+#    saver = tf.train.import_meta_graph('/mnt/snake/snakeNN/snakeNN_code/models/good_models/SLR_new_generator/20171028_075935/output_snake_model_20171028_075935.meta')
+#    saver.restore(sess, tf.train.latest_checkpoint('/mnt/snake/snakeNN/snakeNN_code/models/good_models/SLR_new_generator/20171028_075935/'))
+
+
+    saver = tf.train.import_meta_graph('/mnt/snake/snakeNN/snakeNN_code/models/good_models/SLR_new_generator/20171030_173222/output_snake_model_20171030_173222.meta')
+    saver.restore(sess, tf.train.latest_checkpoint('/mnt/snake/snakeNN/snakeNN_code/models/good_models/SLR_new_generator/20171030_173222/'))
+   # saver.restore(sess,"output_snake_model.data-00000-of-00001")
     
     print("setting up graph variables...")
     graph = tf.get_default_graph()
@@ -153,11 +181,16 @@ with tf.Session() as sess:
 
     result_argmax = graph.get_tensor_by_name("result_argmax:0")
 
+
+    warmUp = np.load("/mnt/snake/snakeNN/snakeNN_data9/trainingData/trainingDataBoards1.npy")
+    warmUp_arr = sess.run(result_argmax, feed_dict={x: boardSplitter(np.array(warmUp[0])),keep_prob: 1.0})
+
     # Making connection
     print("Waiting for connection... ")
     connectSocket, addr = serverSocket.accept()
     while 1:
-
+	result_arr = []
+	result = ""
         print("Connection established from " + str(addr))
         mapReceived = ''
         expectedTotalData = connectSocket.recv(5)
@@ -174,6 +207,9 @@ with tf.Session() as sess:
                 mapReceived = mapReceived + mapPacket
         else:
             print("connection lost at: " + str(datetime.datetime.now()) + " - closing and reopening connection...")
+            logFile.write("**********************************************************************************************\n")
+            logFile.write("connection lost at: " + str(datetime.datetime.now()) + " - closing and reopening connection...\n")
+            logFile.write("**********************************************************************************************\n")
             connectSocket.close()
             print("Waiting for connection... ")
             connectSocket, addr = serverSocket.accept()
@@ -181,13 +217,16 @@ with tf.Session() as sess:
             # After Crash if client sends data too quickly after establishing connection server will crash
             ##############################################################
             continue
-
+        
         #print("mapReceived before pickle loads: " + str(mapReceived))
         board = pickle.loads(mapReceived)
         #print("Received map, sending it through deepnn")
 #        result_arr = sess.run(result_argmax, feed_dict={x: boardMap.reshape(1,2704), keep_prob: 1.0})
 
-	boardArr = np.array([board])
+#	boardArr = np.array([board])
+        logFile.write("!!!!!!!!!!!!!!!   " + str(time.time() - startTime) + "\n")
+        boardArr = boardSplitter(np.array(board))
+	logFile.write("@@@@@@@@@@@@@@@@   " + str(time.time() - startTime) + "\n")
         result_arr = sess.run(result_argmax, feed_dict={
             x: boardArr,
             keep_prob: 1.0})
@@ -197,9 +236,13 @@ with tf.Session() as sess:
         #print("Obtained result " + result + " from deepnn. Pickling it now.")
         # returnResult = pickle.dumps(result)
         # print("Sending result to client...")
-        connectSocket.send(result)
-        #drawBoard(boardArr[0])
-	print("time for move: " + str(time.time() - startTime) + " seconds. answer was: " + str(result_arr))
+        logFile.write("$$$$$$$$$$$$$$$$$$$$$   " + str(time.time() - startTime) + "\n")
+        connectSocket.send(result)#.encode('utf-8'))
+        logFile.write("%%%%%%%%%%%%%%%%%%%   " + str(time.time() - startTime) + "\n")
+	
+        drawBoard(board)
+	print("time for move: " + str(time.time() - startTime) + " seconds. answer was: " + str(result))
+        logFile.write("\ntime for move: " + str(time.time() - startTime) + " seconds. answer was: " + str(result) + "\n\n\n")
         # print("Done serving client, reseting for new client")
 
     print("Done sending. Closing Connection...")
