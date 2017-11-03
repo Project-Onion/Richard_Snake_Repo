@@ -1,0 +1,359 @@
+# Based off of:
+# http://ischlag.github.io/2016/06/12/async-distributed-tensorflow/
+# https://www.tensorflow.org/deploy/distributed
+# Aswell as tensorflow mnist tutorial for experts
+
+from __future__ import absolute_import
+from __future__ import division
+from __future__ import print_function
+
+import tempfile
+import time
+import sys
+import datetime
+
+import random
+
+import numpy as np
+
+import tensorflow as tf
+
+
+
+tf.app.flags.DEFINE_integer('training_iteration', 1,
+                            'number of training iterations.')
+tf.app.flags.DEFINE_integer('model_version', 1, 'version number of the model.')
+tf.app.flags.DEFINE_string('work_dir', '/home/student/Desktop/', 'Working directory.')
+
+tf.app.flags.DEFINE_string("job_name", "", "Either 'ps' or 'worker'")
+tf.app.flags.DEFINE_integer("task_index", 0, "Index of task within the job")
+
+FLAGS = tf.app.flags.FLAGS
+
+
+def deepnn(x, keep_prob):
+    with tf.name_scope('reshape'):
+        x_image = tf.reshape(x, [-1, 52, 52, 3])
+
+    # First convolutional layer - maps one grayscale image to 96 feature maps.
+    with tf.name_scope('conv1'):
+        W_conv1 = weight_variable([11, 11, 3, 96]) #feature size 11x11 to have 42x42 image after convolution
+        b_conv1 = bias_variable([96]) #96 feature maps - arbitrary - can change
+        h_conv1 = tf.nn.relu(conv2d(x_image, W_conv1) + b_conv1) #uses max function (instead of sigmoid function)
+
+#now 52x52x96
+
+    # Pooling layer - downsamples by 2X.
+    with tf.name_scope('pool1'):
+        h_pool1 = max_pool_2x2(h_conv1) #now size will be 21x21x96
+
+#now 26x26x96
+
+    # Second convolutional layer -- maps 96 feature maps to 256.
+    with tf.name_scope('conv2'):
+        W_conv2 = weight_variable([11, 11, 96, 256]) #feature size 10x10 to have 12x12 image after convolution
+        b_conv2 = bias_variable([256])
+        h_conv2 = tf.nn.relu(conv2d(h_pool1, W_conv2) + b_conv2)
+
+#now 26x26x256
+
+    # Second pooling layer.
+    with tf.name_scope('pool2'):
+        h_pool2 = max_pool_2x2(h_conv2) #now size will be 6x6x256
+
+#now 13x13x256
+
+    # Third convolutional layer -- maps 256 feature maps to 384.
+    with tf.name_scope('conv2'):
+        W_conv3 = weight_variable([3, 3, 256, 384]) #feature size 3x3 to have 4x4 image after convolution
+        b_conv3 = bias_variable([384])
+        h_conv3 = tf.nn.relu(conv2d(h_pool2, W_conv3) + b_conv3)
+
+    # Fourth convolutional layer -- maps 384 feature maps to 384.
+    with tf.name_scope('conv2'):
+        W_conv4 = weight_variable([3, 3, 384, 384]) #feature size 3x3 to have 2x2 image after convolution
+        b_conv4 = bias_variable([384])
+        h_conv4 = tf.nn.relu(conv2d(h_conv3, W_conv4) + b_conv4)
+
+    # Fifth convolutional layer -- maps 32 feature maps to 64.
+    with tf.name_scope('conv2'):
+        W_conv5 = weight_variable([3, 3, 384, 256]) #feature size 4x4 to have 20x20 image after convolution
+        b_conv5 = bias_variable([256])
+        h_conv5 = tf.nn.relu(conv2d(h_conv4, W_conv5) + b_conv5)
+
+    # Third pooling layer.
+    with tf.name_scope('pool3'):
+        h_pool3 = max_pool_2x2(h_conv5) #now size will be 10x10x64
+
+# now 6x6x256
+
+    # Fully connected layer 1 -- after 2 round of downsampling, our 28x28 image
+    # is down to 10x10x64 feature maps -- maps this to 1024 features.
+    with tf.name_scope('fc1'):
+        W_fc1 = weight_variable([7 * 7 * 256, 2048]) #4096 = first power of 2 larger than 2500 (=50x50)
+        b_fc1 = bias_variable([2048])
+
+        # h_pool2_flat = tf.reshape(h_conv2, [-1, 10 * 10 * 64])
+        h_pool3_flat = tf.reshape(h_pool3, [-1, 7 * 7 * 256])
+        h_fc1 = tf.nn.relu(tf.matmul(h_pool3_flat, W_fc1) + b_fc1)
+
+    # Dropout - controls the complexity of the model, prevents co-adaptation of
+    # features.
+    with tf.name_scope('dropout1'): #maybe add dropout to other layers aswell?
+        h_fc1_drop = tf.nn.dropout(h_fc1, keep_prob)
+
+    with tf.name_scope('fc2'):
+        W_fc2 = weight_variable([2048, 2048]) #4096 = first power of 2 larger than 2500 (=50x50)
+        b_fc2 = bias_variable([2048])
+
+        # h_pool2_flat = tf.reshape(h_conv2, [-1, 10 * 10 * 64])
+        h_fc2 = tf.nn.relu(tf.matmul(h_fc1_drop, W_fc2) + b_fc2)
+
+    # Dropout - controls the complexity of the model, prevents co-adaptation of
+    # features.
+    with tf.name_scope('dropout2'): #maybe add dropout to other layers aswell?
+        h_fc2_drop = tf.nn.dropout(h_fc2, keep_prob)
+
+    # Map the 4096 features to 3 classes, one for each direction
+    with tf.name_scope('fc3'):
+        W_fc3 = weight_variable([2048, 3])
+        b_fc3 = bias_variable([3])
+
+        # y_conv = tf.matmul(h_fc1_drop, W_fc2) + b_fc2
+        y_conv = tf.matmul(h_fc2_drop, W_fc3) + b_fc3
+
+    #regularizer = tf.nn.l2_loss(W_conv1) + tf.nn.l2_loss(W_conv2) + tf.nn.l2_loss(W_fc1) + tf.nn.l2_loss(W_fc2)
+    # regularizer = tf.nn.l2_loss(W_fc0) + tf.nn.l2_loss(W_conv1) + tf.nn.l2_loss(W_conv2) + tf.nn.l2_loss(W_fc1) + tf.nn.l2_loss(W_fc2)
+
+    return y_conv, keep_prob#, regularizer
+
+def conv2d(x, W):
+  """conv2d returns a 2d convolution layer with full stride."""
+  return tf.nn.conv2d(x, W, strides=[1, 1, 1, 1], padding='SAME') #VALID = no padding
+
+
+def max_pool_2x2(x):
+  """max_pool_2x2 downsamples a feature map by 2X."""
+  return tf.nn.max_pool(x, ksize=[1, 2, 2, 1],
+                        strides=[1, 2, 2, 1], padding='SAME') #VALID = no padding
+
+def weight_variable(shape):
+  """weight_variable generates a weight variable of a given shape."""
+  initial = tf.truncated_normal(shape, stddev=0.1)
+  return tf.Variable(initial)
+
+
+def bias_variable(shape):
+  """bias_variable generates a bias variable of a given shape."""
+  initial = tf.constant(0.1, shape=shape)
+  return tf.Variable(initial)
+
+"""
+def batchGenerator(batchData, mini_batch_size):
+    for batchStartIndex in range(0,len(batchData[0]), mini_batch_size):
+        batchEndIndex = batchStartIndex + min(mini_batch_size, len(batchData[0]) - batchStartIndex)
+        batch = [batchData[i][batchStartIndex:batchEndIndex] for i in range(2)]
+        yield [\
+            [np.array([[pixel if (pixel == 1 or pixel == 2) else 0, pixel if (pixel == 4) else 0, pixel if (pixel == 5 or pixel == 6) else 0] for pixel in image]).flatten() for image in batch[0]], \
+            # [[pixel if (pixel == 4) else 0 for pixel in image] for image in batch[0]], \
+            # [[pixel if (pixel == 5 or pixel == 6) else 0 for pixel in image] for image in batch[0]]], \
+            batch[1]]
+
+def batchGenerator(batchData, mini_batch_size): #our snake different color
+    for batchStartIndex in range(0,len(batchData[0]), mini_batch_size):
+        batchEndIndex = batchStartIndex + min(mini_batch_size, len(batchData[0]) - batchStartIndex)
+        batch = [batchData[i][batchStartIndex:batchEndIndex] for i in range(2)]
+        yield [\
+            [np.array([\
+                [pixel if (pixel == 1 or pixel == 2) else 0 for pixel in board],\
+                [pixel if (pixel == 4 or pixel == 3) else 0 for pixel in board],\
+                [pixel if (pixel == 5 or pixel == 6) else 0 for pixel in board]]).flatten() for board in batch[0]], \
+            batch[1]]
+"""
+def batchGenerator(batchData, mini_batch_size): #border different color
+    for batchStartIndex in range(0,len(batchData[0]), mini_batch_size):
+        batchEndIndex = batchStartIndex + min(mini_batch_size, len(batchData[0]) - batchStartIndex)
+        batch = [batchData[i][batchStartIndex:batchEndIndex] for i in range(2)]
+        yield [\
+            [np.array([\
+                [pixel if (pixel == 1 or pixel == 2 or pixel == 3) else 0 for pixel in board],\
+                [pixel if (pixel == 4 or pixel == 5) else 0 for pixel in board],\
+                [pixel if (pixel == 6 or pixel == 7) else 0 for pixel in board]\
+                ]).flatten() for board in batch[0]], \
+            batch[1]]
+
+
+def main(_):
+    print("\n\n --- STARTING CODE ---")
+    print("------------------------")
+
+    startTime = time.time()
+
+    amountOfMiniBatchFilesToTrain = 100
+    amountOfMiniBatchFilesToValidate = 1
+    amountOfMiniBatchFilesToTest = 15 #was 20
+    starting_learning_rate = 5*1e-4  #was 1e-3
+    mini_batch_size = 500   #was 500
+    numEpochs = 1
+    dataFileNumber = 9 #was 3, then 5
+    innerFolder = ""
+
+    print("amountOfMiniBatchFilesToTrain: " + str(amountOfMiniBatchFilesToTrain))
+    print("amountOfMiniBatchFilesToValidate: " + str(amountOfMiniBatchFilesToValidate))
+    print("amountOfMiniBatchFilesToTest: " + str(amountOfMiniBatchFilesToTest))
+    print ("starting learning rate: " + str(starting_learning_rate))
+    print ("mini batch size: "+str(mini_batch_size))
+    print ("epochs to be trained: " +str(numEpochs))
+#    sys.stdout.flush()
+
+    global_step = tf.Variable(0, trainable=False)
+    # confusion = np.zeros([3,3])
+    with tf.device('/gpu:0'):
+
+        # Create the model
+        x = tf.placeholder(tf.float32, [None, 2704*3], name="x")
+
+        # Define loss and optimizer
+        y_ = tf.placeholder(tf.float32, [None, 3], name="y")
+
+        keep_prob = tf.placeholder(tf.float32, name="keep_prob")
+        # Build the graph for the deep net
+        # y_conv, keep_prob, regularizer = deepnn(x) # with l2 regularization
+        y_conv, keep_prob= deepnn(x, keep_prob)
+
+        tf.argmax(y_conv, 1, output_type=tf.int32, name="result_argmax")
+
+        with tf.name_scope('loss'):
+            cross_entropy = tf.nn.softmax_cross_entropy_with_logits(labels=y_,
+                                                                    logits=y_conv)
+        # beta = 0.01 #lambda
+
+        cross_entropy = tf.reduce_mean(cross_entropy)# + beta*regularizer)
+
+        with tf.name_scope('adam_optimizer'): #adam replaces gradient decent
+#            learning_rate = tf.placeholder(tf.float32, name="learning_rate") #1e-3
+            learning_rate = starting_learning_rate #tf.train.exponential_decay(starting_learning_rate, global_step, 100, 0.96, staircase=True)
+            # train_step = tf.train.GradientDescentOptimizer(learning_rate = learning_rate).minimize(cross_entropy)
+            train_step = tf.train.AdamOptimizer(learning_rate).minimize(cross_entropy)
+#            print ("adam with learning rate: " + str(learning_rate))
+#            sys.stdout.flush()
+        with tf.name_scope('accuracy'):
+            correct_prediction = tf.equal(tf.argmax(y_conv, 1), tf.argmax(y_, 1))
+            correct_prediction = tf.cast(correct_prediction, tf.float32)
+        accuracy = tf.reduce_mean(correct_prediction, name="accuracy1")
+        confusion = np.zeros([3, 3])
+        confusion = tf.confusion_matrix(labels=tf.argmax(y_, 1), predictions=tf.argmax(y_conv, 1), num_classes=3, name="confusion1")
+#        print("Variables initialized ...")
+    
+    sys.stdout.flush()
+    # confusion = tf.confusion_matrix(labels=tf.argmax(y_, 1), predictions=tf.argmax(y_conv, 1), num_classes=3)#, name="confusion")
+    fileLocation = "/mnt/snake/snakeNN/snakeNN_data"+ str(dataFileNumber) +"/"
+
+    graph_location = tempfile.mkdtemp()
+    print('Saving graph to: %s' % graph_location)
+    sys.stdout.flush()
+    train_writer = tf.summary.FileWriter(graph_location)
+    train_writer.add_graph(tf.get_default_graph())
+
+    print("\nstarting session")
+    config = tf.ConfigProto(allow_soft_placement = True)
+    with tf.Session(config = config) as sess:
+        saver = tf.train.Saver()
+        now = datetime.datetime.now().strftime("%Y%m%d_%H%M%S")
+
+        sess.run(tf.global_variables_initializer())
+
+        validationBatchData = [np.load(fileLocation + "validationData/"+ innerFolder + 'validationDataBoards' + str(1) + ".npy"),
+                     np.load(fileLocation + "validationData/" + innerFolder + 'validationDataMoves' + str(1) + ".npy")]
+
+        # final_confusion = np.zeros([3,3])
+        print ("variables initialized, starting training...\n")
+        for i in range(1,amountOfMiniBatchFilesToTrain + 1):
+            batchData = [np.load(fileLocation + "trainingData/"+ innerFolder + 'trainingDataBoards' + str(i) + ".npy"),
+                         np.load(fileLocation + "trainingData/" + innerFolder + 'trainingDataMoves' + str(i) + ".npy")]
+            for epoch in range(numEpochs):
+                rearrange = np.array(range(len(batchData[0])))
+                np.random.shuffle(rearrange)
+                print("minibatch file: " + str(i) + " epoch " + str(epoch + 1) + " started training. time passed: " + str(time.time() - startTime))
+                sys.stdout.flush()
+                # miniBatchGenerator = batchGenerator([batchData[0][rearrange],batchData[1][rearrange]], mini_batch_size)
+                for miniBatch in batchGenerator([batchData[0][rearrange],batchData[1][rearrange]], mini_batch_size):
+                    train_step.run(
+                        feed_dict={x: miniBatch[0],
+                                   y_: miniBatch[1],
+                                   keep_prob: 0.5})#,
+#                                   learning_rate: starting_learning_rate})
+                    global_step = global_step + 1
+
+            saver.save(sess, 'models/output_snake_model_' + now, global_step=2000)
+
+            print("minibatch file: " + str(i) + " started validation. time passed: "+ str(time.time()-startTime))
+            sys.stdout.flush()
+            sumOfValidations = 0
+            amountOfValidations = 0
+            final_confusion = np.zeros([3,3])
+            # validationMiniBatchGenerator = batchGenerator(validationBatchData, mini_batch_size)
+            for miniBatch in batchGenerator(validationBatchData, mini_batch_size):
+                validate_accuracy = accuracy.eval(feed_dict={
+                    x: miniBatch[0],
+                    y_: miniBatch[1],
+                    keep_prob: 1.0})#,
+ #                   learning_rate: starting_learning_rate})
+                final_confusion = final_confusion + confusion.eval(feed_dict={
+                    x: miniBatch[0],
+                    y_: miniBatch[1],
+                    keep_prob: 1.0})
+                # print('epoch %d, training accuracy %g' % (epoch, train_accuracy))
+                sumOfValidations = sumOfValidations + validate_accuracy
+                amountOfValidations = amountOfValidations + 1
+                #print (validate_accuracy)
+
+            print("minibatch file "+ str(i+1) + "/" +str(amountOfMiniBatchFilesToTrain) +  " validation: "  + str(sumOfValidations/amountOfValidations))
+            print("minibatch file " +str(i+1)+ " confusion matrix:\n" + str(final_confusion))
+            sys.stdout.flush()
+
+        trainEndTime = time.time()
+        print ("training and validation ended. \t time it took: " + str(trainEndTime - startTime))
+        print ("starting testing...")
+        sys.stdout.flush()
+        sumOfTests = 0
+        amountOfTests = 0
+        for i in range(1, amountOfMiniBatchFilesToTest + 1):
+            batchData = [np.load(fileLocation + "testData/" + innerFolder + 'testDataBoards' + str(i) + ".npy"),
+                         np.load(fileLocation + "testData/" + innerFolder + 'testDataMoves' + str(i) + ".npy")]
+#            amountOfTests = 0
+#             testMiniBatchGenerator = batchGenerator(batchData, mini_batch_size)
+            for miniBatch in batchGenerator(batchData, mini_batch_size):
+                test_accuracy = accuracy.eval(feed_dict={
+                    x: miniBatch[0],
+                    y_: miniBatch[1],
+                    keep_prob: 1.0})#,
+#                    learning_rate: starting_learning_rate})
+                #print('epoch %d, test accuracy %g' % (epoch, test_accuracy))
+                sumOfTests = sumOfTests + test_accuracy
+                amountOfTests = amountOfTests + 1
+
+        print("test accuracy: " + str(sumOfTests / amountOfTests))
+        sys.stdout.flush()
+        # print('test accuracy %g' % accuracy.eval(feed_dict={
+        #     x: np.stack(numpyCombinedTestData[0]), y_: np.stack(numpyCombinedTestData[1]), keep_prob: 1.0}))
+
+        testEndTime = time.time()
+        print("testing ended. \t time for testing: " + str(testEndTime - trainEndTime) + "\t total time: "+ str(testEndTime - startTime))
+        sys.stdout.flush()
+ 	
+        print("final confusion matrix:\n" + str(final_confusion))
+        sys.stdout.flush()
+	
+
+        # export_path = "/home/student/Desktop/saved_models/model" + str(FLAGS.model_version)#+".ckpt"
+   	 #save_path = saver.save(sess, export_path)
+
+        save_path = saver.save(sess, 'models/output_snake_model_'+now)
+        print("Model saved in file: %s" % save_path)
+        sys.stdout.flush()
+
+
+if __name__ == '__main__':
+
+    tf.app.run(main=main)
