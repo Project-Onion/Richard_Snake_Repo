@@ -46,31 +46,31 @@ def deepnn(x, keep_prob):
     with tf.name_scope('pool1'):
         h_pool1 = max_pool_2x2(h_conv1) #now size will be 23x23x32
 
-    # Second convolutional layer -- maps 32 feature maps to 64.
-    with tf.name_scope('conv2'):
-        W_conv2 = weight_variable([5, 5, 32, 64]) #feature size 5x5 to have 19x19  image after convolution
-        b_conv2 = bias_variable([64])
-        h_conv2 = tf.nn.relu(conv2d(h_pool1, W_conv2) + b_conv2)
-        # h_conv2 = tf.nn.relu(conv2d(h_conv1, W_conv2) + b_conv2)
-
-    # Second pooling layer.
-    with tf.name_scope('pool2'):
-         h_pool2 = max_pool_2x2(h_conv2) #now size will be 10x10x64
-
-    # Third convolutional layer -- maps 32 feature maps to 64.
-    with tf.name_scope('conv3'):
-         W_conv3 = weight_variable([3, 3, 64, 128]) #feature size 3x3 to have 8x8 image after convolution
-         b_conv3 = bias_variable([128])
-         h_conv3 = tf.nn.relu(conv2d(h_pool2, W_conv3) + b_conv3)
+    # # Second convolutional layer -- maps 32 feature maps to 64.
+    # with tf.name_scope('conv2'):
+    #     W_conv2 = weight_variable([5, 5, 32, 64]) #feature size 5x5 to have 19x19  image after convolution
+    #     b_conv2 = bias_variable([64])
+    #     h_conv2 = tf.nn.relu(conv2d(h_pool1, W_conv2) + b_conv2)
+    #     # h_conv2 = tf.nn.relu(conv2d(h_conv1, W_conv2) + b_conv2)
+    #
+    # # Second pooling layer.
+    # with tf.name_scope('pool2'):
+    #      h_pool2 = max_pool_2x2(h_conv2) #now size will be 10x10x64
+    #
+    # # Third convolutional layer -- maps 32 feature maps to 64.
+    # with tf.name_scope('conv3'):
+    #      W_conv3 = weight_variable([3, 3, 64, 128]) #feature size 3x3 to have 8x8 image after convolution
+    #      b_conv3 = bias_variable([128])
+    #      h_conv3 = tf.nn.relu(conv2d(h_pool2, W_conv3) + b_conv3)
 
     # Fully connected layer 1 -- after 2 round of downsampling, our 28x28 image
     # is down to 10x10x64 feature maps -- maps this to 1024 features.
     with tf.name_scope('fc1'):
-        W_fc1 = weight_variable([7 * 7 * 128, 4096]) #4096 = first power of 2 larger than 2500 (=50x50), also (8*8*128 = 8192)/2
-        b_fc1 = bias_variable([4096])
+        W_fc1 = weight_variable([23 * 23 * 32, 2048]) #4096 = first power of 2 larger than 2500 (=50x50), also (8*8*128 = 8192)/2
+        b_fc1 = bias_variable([2048])
 
         # h_pool2_flat = tf.reshape(h_conv2, [-1, 10 * 10 * 64])
-        h_conv3_flat = tf.reshape(h_conv3, [-1, 7 * 7 * 128])
+        h_conv3_flat = tf.reshape(h_pool1, [-1, 23 * 23 * 32])
         h_fc1 = tf.nn.relu(tf.matmul(h_conv3_flat, W_fc1) + b_fc1)
 
     # Dropout - controls the complexity of the model, prevents co-adaptation of
@@ -80,6 +80,14 @@ def deepnn(x, keep_prob):
 
     # Map the 4096 features to 3 classes, one for each direction
     with tf.name_scope('fc2'):
+        W_fc2 = weight_variable([2048, 4096])
+        b_fc2 = bias_variable([3])
+
+        # y_conv = tf.matmul(h_fc1_drop, W_fc2) + b_fc2
+        y_conv = tf.matmul(h_fc1, W_fc2) + b_fc2
+
+    # Map the 4096 features to 3 classes, one for each direction
+    with tf.name_scope('fc3'):
         W_fc2 = weight_variable([4096, 3])
         b_fc2 = bias_variable([3])
 
@@ -231,12 +239,11 @@ def main(_):
 
         # final_confusion = np.zeros([3,3])
         print ("variables initialized, starting training...\n")
-        for i in range(1,amountOfMiniBatchFilesToTrain + 1):
-            #if i>70:
-                #starting_learning_rate = 5*1e-5
-            batchData = [np.load(fileLocation + "trainingData/"+ innerFolder + 'trainingDataBoards' + str(i) + ".npy"),
-                         np.load(fileLocation + "trainingData/" + innerFolder + 'trainingDataMoves' + str(i) + ".npy")]
-            for epoch in range(numEpochs):
+        for epoch in range(numEpochs):
+            for i in range(1,amountOfMiniBatchFilesToTrain + 1):
+                batchData = [np.load(fileLocation + "trainingData/"+ innerFolder + 'trainingDataBoards' + str(i) + ".npy"),
+                             np.load(fileLocation + "trainingData/" + innerFolder + 'trainingDataMoves' + str(i) + ".npy")]
+
                 rearrange = np.array(range(len(batchData[0])))
                 np.random.shuffle(rearrange)
                 print("minibatch file: " + str(i) + " epoch " + str(epoch + 1) + " started training. time passed: " + str(time.time() - startTime))
@@ -249,6 +256,7 @@ def main(_):
                                    keep_prob: keep_prob_start})#,
 #                                   learning_rate: starting_learning_rate})
                     global_step = global_step + 1
+
             print("minibatch file: " + str(i) + " started validation. time passed: "+ str(time.time()-startTime))
             sys.stdout.flush()
             sumOfValidations = 0

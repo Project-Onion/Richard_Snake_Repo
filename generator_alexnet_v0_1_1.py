@@ -33,7 +33,7 @@ FLAGS = tf.app.flags.FLAGS
 
 def deepnn(x, keep_prob):
     with tf.name_scope('reshape'):
-        x_image = tf.reshape(x, [-1, 52, 52, 3])
+        x_image = tf.reshape(x, [-1, 50, 50, 3])
 
     # First convolutional layer - maps one grayscale image to 96 feature maps.
     with tf.name_scope('conv1'):
@@ -41,13 +41,13 @@ def deepnn(x, keep_prob):
         b_conv1 = bias_variable([96]) #96 feature maps - arbitrary - can change
         h_conv1 = tf.nn.relu(conv2d(x_image, W_conv1) + b_conv1) #uses max function (instead of sigmoid function)
 
-#now 52x52x96
+#now 50x50x96
 
     # Pooling layer - downsamples by 2X.
     with tf.name_scope('pool1'):
         h_pool1 = max_pool_2x2(h_conv1) #now size will be 21x21x96
 
-#now 26x26x96
+#now 25x25x96
 
     # Second convolutional layer -- maps 96 feature maps to 256.
     with tf.name_scope('conv2'):
@@ -55,13 +55,13 @@ def deepnn(x, keep_prob):
         b_conv2 = bias_variable([256])
         h_conv2 = tf.nn.relu(conv2d(h_pool1, W_conv2) + b_conv2)
 
-#now 26x26x256
+#now 25x25x256
 
     # Second pooling layer.
     with tf.name_scope('pool2'):
         h_pool2 = max_pool_2x2(h_conv2) #now size will be 6x6x256
 
-#now 13x13x256
+#now 12x12x256
 
     # Third convolutional layer -- maps 256 feature maps to 384.
     with tf.name_scope('conv2'):
@@ -189,13 +189,13 @@ def main(_):
 
     startTime = time.time()
 
-    amountOfMiniBatchFilesToTrain = 100
+    amountOfMiniBatchFilesToTrain = 120
     amountOfMiniBatchFilesToValidate = 1
     amountOfMiniBatchFilesToTest = 15 #was 20
-    starting_learning_rate = 5*1e-4  #was 1e-3
+    starting_learning_rate = 5*1e-6  #was 1e-3
     mini_batch_size = 500   #was 500
     numEpochs = 1
-    dataFileNumber = 9 #was 3, then 5
+    dataFileNumber = 10 #was 3, then 9
     innerFolder = ""
 
     print("amountOfMiniBatchFilesToTrain: " + str(amountOfMiniBatchFilesToTrain))
@@ -211,7 +211,7 @@ def main(_):
     with tf.device('/gpu:0'):
 
         # Create the model
-        x = tf.placeholder(tf.float32, [None, 2704*3], name="x")
+        x = tf.placeholder(tf.float32, [None, 2500*3], name="x")
 
         # Define loss and optimizer
         y_ = tf.placeholder(tf.float32, [None, 3], name="y")
@@ -268,10 +268,11 @@ def main(_):
 
         # final_confusion = np.zeros([3,3])
         print ("variables initialized, starting training...\n")
-        for i in range(1,amountOfMiniBatchFilesToTrain + 1):
-            batchData = [np.load(fileLocation + "trainingData/"+ innerFolder + 'trainingDataBoards' + str(i) + ".npy"),
-                         np.load(fileLocation + "trainingData/" + innerFolder + 'trainingDataMoves' + str(i) + ".npy")]
-            for epoch in range(numEpochs):
+        for epoch in range(numEpochs):
+            for i in range(1,amountOfMiniBatchFilesToTrain + 1):
+                batchData = [np.load(fileLocation + "trainingData/"+ innerFolder + 'trainingDataBoards' + str(i) + ".npy"),
+                             np.load(fileLocation + "trainingData/" + innerFolder + 'trainingDataMoves' + str(i) + ".npy")]
+
                 rearrange = np.array(range(len(batchData[0])))
                 np.random.shuffle(rearrange)
                 print("minibatch file: " + str(i) + " epoch " + str(epoch + 1) + " started training. time passed: " + str(time.time() - startTime))

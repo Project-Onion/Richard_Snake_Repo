@@ -20,6 +20,6 @@ timestamp=$(date +%Y%m%d%H%M%S)
 
 #tail -f logs/snake_richard_tests_$timestamp.log
 
+python generator_v0_1_1.py | tee logs/generator_v0_1_1_$timestamp.log
 
-
-python generator_alexnet_v0_1_1.py| tee logs/generator_alexnet_v0_1_1_$timestamp.log
+#python generator_alexnet_v0_1_1.py| tee logs/generator_alexnet_v0_1_1_$timestamp.log
