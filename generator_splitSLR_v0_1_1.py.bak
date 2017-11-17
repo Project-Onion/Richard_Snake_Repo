@@ -153,10 +153,10 @@ def main(_):
 
     startTime = time.time()
 
-    amountOfMiniBatchFilesToTrain = 139
+    amountOfMiniBatchFilesToTrain = 50
     amountOfMiniBatchFilesToValidate = 1
     amountOfMiniBatchFilesToTest = 15 #was 2
-    starting_learning_rate = 1e-3 #5*1e-4  #was 1e-3
+    starting_learning_rate = 5*1e-4  #was 1e-3
     mini_batch_size = 500   #was 500
     numEpochs = 50
     dataFileNumber = 14 #was 3, then 5
@@ -174,7 +174,7 @@ def main(_):
 #    sys.stdout.flush()
 
     global_step = tf.Variable(0, trainable=False)
-    learning_rate = tf.train.exponential_decay(starting_learning_rate, global_step, 1000, 0.96, staircase=True)
+    learning_rate = starting_learning_rate #tf.train.exponential_decay(starting_learning_rate, global_step, 1000, 0.96, staircase=True)
     confusion = np.zeros([3,3])
     with tf.device('/gpu:0'):
 
@@ -230,9 +230,15 @@ def main(_):
         saver = tf.train.Saver()
         sess.run(tf.global_variables_initializer())
 
-        validationBatchData = [np.load(fileLocation + "validationData/"+ innerFolder + 'validationDataBoards' + str(1) + ".npy"),
-                     np.load(fileLocation + "validationData/" + innerFolder  + 'validationDataMoves' + str(1) + ".npy")]
-
+        validationBatchDataStraight = [np.load(fileLocation + "validationData/" + 'validationDataBoardsStraight' + str(1) + ".npy"),
+                     np.load(fileLocation + "validationData/" + 'validationDataMovesStraight' + str(1) + ".npy")]
+        validationBatchDataLeft = [np.load(fileLocation + "validationData/"+ 'validationDataBoardsLeft' + str(1) + ".npy"),
+                     np.load(fileLocation + "validationData/" + 'validationDataMovesLeft' + str(1) + ".npy")]
+        validationBatchDataRight = [np.load(fileLocation + "validationData/"+ 'validationDataBoardsRight' + str(1) + ".npy"),                     np.load(fileLocation + "validationData/"  + 'validationDataMovesRight' + str(1) + ".npy")]
+        
+        validationDataShuffle = np.array(range(len(validationBatchDataStraight[0]) + len(validationBatchDataLeft[0]) + len(validationBatchDataRight[0])))
+        np.random.shuffle(validationDataShuffle)
+        validationBatchData = [np.concatenate((validationBatchDataStraight[0] , validationBatchDataLeft[0] , validationBatchDataRight[0]))[validationDataShuffle] , np.concatenate((validationBatchDataStraight[1] , validationBatchDataLeft[1] , validationBatchDataRight[1]))[validationDataShuffle]]
         validationBatchDataBiased = [np.load("/mnt/snake/snakeNN/snakeNN_data11/validationData/"+ innerFolder + 'validationDataBoards' + str(1) + ".npy"),
                      np.load("/mnt/snake/snakeNN/snakeNN_data11/validationData/" + innerFolder + 'validationDataMoves' + str(1) + ".npy")]
         # final_confusion = np.zeros([3,3])
@@ -242,15 +248,23 @@ def main(_):
             for i in range(1,amountOfMiniBatchFilesToTrain + 1):
             #if i>70:
                 #starting_learning_rate = 5*1e-5
-                batchData = [np.load(fileLocation + "trainingData/"+ innerFolder + 'trainingDataBoards' + str(i) + ".npy"),
-                             np.load(fileLocation + "trainingData/" + innerFolder + 'trainingDataMoves' + str(i) + ".npy")]
+                batchDataStraight = [np.load(fileLocation + "trainingData/"+ "straight/" + 'trainingDataBoards' + str(i) + ".npy"),
+                             np.load(fileLocation + "trainingData/" + "straight/" + 'trainingDataMoves' + str(i) + ".npy")]
+                batchDataLeft = [np.load(fileLocation + "trainingData/"+ "left/" + 'trainingDataBoards' + str(i) + ".npy"),
+                             np.load(fileLocation + "trainingData/" + "left/" + 'trainingDataMoves' + str(i) + ".npy")]
+                batchDataRight = [np.load(fileLocation + "trainingData/"+ "right/" + 'trainingDataBoards' + str(i) + ".npy"),
+                             np.load(fileLocation + "trainingData/" + "right/" + 'trainingDataMoves' + str(i) + ".npy")]
+
+                dataShuffle = np.array(range(len(batchDataStraight[0]) + len(batchDataLeft[0]) + len(batchDataRight[0])))
+                np.random.shuffle(dataShuffle)
+                batchData = [np.concatenate((batchDataStraight[0] , batchDataLeft[0] , batchDataRight[0]))[dataShuffle] , np.concatenate((batchDataStraight[1] , batchDataLeft[1] , batchDataRight[1]))[dataShuffle]]
 #            for epoch in range(numEpochs):
-                rearrange = np.array(range(len(batchData[0])))
-                np.random.shuffle(rearrange)
-                print("minibatch file: " + str(i) + " epoch " + str(epoch + 1) + " started training.\tglobal step is: " + str(global_step.eval()) + "\tlearning rate is: " + str(learning_rate.eval()) + "\ttime passed: " + str(time.time() - startTime))
+                #rearrange = np.array(range(len(batchData[0])))
+                #np.random.shuffle(rearrange)
+                print("minibatch file: " + str(i) + " epoch " + str(epoch + 1) + " started training.\tglobal step is: " + str(global_step.eval()) + "\tlearning rate is: " + str(learning_rate) + "\ttime passed: " + str(time.time() - startTime))
                 sys.stdout.flush()
                 # miniBatchGenerator = batchGenerator([batchData[0][rearrange],batchData[1][rearrange]], mini_batch_size)
-                for miniBatch in batchGenerator([batchData[0][rearrange],batchData[1][rearrange]], mini_batch_size):
+                for miniBatch in batchGenerator(batchData, mini_batch_size):
                     train_step.run(
                         feed_dict={x: miniBatch[0],
                                    y_: miniBatch[1],
@@ -259,7 +273,7 @@ def main(_):
                     #global_step = global_step + 1
             #print("minibatch file: " + str(i) + " started validation. time passed: "+ str(time.time()-startTime))
 
-                if (global_step.eval())%2000 == 0 or epoch == numEpochs-1:
+                if (global_step.eval())%(120*15) == 0 or epoch == numEpochs-1:
                     print("global step: " + str(global_step.eval()) + " started validation on SLR. time passed: "+ str(time.time()-startTime))
                     sys.stdout.flush()
                     sumOfValidations = 0

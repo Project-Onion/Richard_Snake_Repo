@@ -81,10 +81,10 @@ def deepnn(x, keep_prob):
     # Map the 4096 features to 3 classes, one for each direction
     with tf.name_scope('fc2'):
         W_fc2 = weight_variable([2048, 4096])
-        b_fc2 = bias_variable([3])
+        b_fc2 = bias_variable([4096])
 
         # y_conv = tf.matmul(h_fc1_drop, W_fc2) + b_fc2
-        y_conv = tf.matmul(h_fc1, W_fc2) + b_fc2
+        h_fc2 = tf.matmul(h_fc1, W_fc2) + b_fc2
 
     # Map the 4096 features to 3 classes, one for each direction
     with tf.name_scope('fc3'):
@@ -92,7 +92,7 @@ def deepnn(x, keep_prob):
         b_fc2 = bias_variable([3])
 
         # y_conv = tf.matmul(h_fc1_drop, W_fc2) + b_fc2
-        y_conv = tf.matmul(h_fc1, W_fc2) + b_fc2
+        y_conv = tf.matmul(h_fc2, W_fc2) + b_fc2
 
     #regularizer = tf.nn.l2_loss(W_conv1) + tf.nn.l2_loss(W_conv2) + tf.nn.l2_loss(W_fc1) + tf.nn.l2_loss(W_fc2)
     # regularizer = tf.nn.l2_loss(W_fc0) + tf.nn.l2_loss(W_conv1) + tf.nn.l2_loss(W_conv2) + tf.nn.l2_loss(W_fc1) + tf.nn.l2_loss(W_fc2)

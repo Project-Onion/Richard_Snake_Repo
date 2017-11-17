@@ -13,9 +13,9 @@ import sys
 import datetime
 
 import random
+import os
 
 import numpy as np
-
 import tensorflow as tf
 
 
@@ -55,28 +55,28 @@ def deepnn(x, keep_prob):
 
     # Second pooling layer.
     with tf.name_scope('pool2'):
-         h_pool2 = max_pool_2x2(h_conv2) #now size will be 10x10x64
+         h_pool2 = max_pool_2x2(h_conv2) #now size will be 9x9x64
 
     # Third convolutional layer -- maps 32 feature maps to 64.
-    with tf.name_scope('conv3'):
-         W_conv3 = weight_variable([3, 3, 64, 128]) #feature size 3x3 to have 8x8 image after convolution
-         b_conv3 = bias_variable([128])
-         h_conv3 = tf.nn.relu(conv2d(h_pool2, W_conv3) + b_conv3)
+#    with tf.name_scope('conv3'):
+#         W_conv3 = weight_variable([3, 3, 64, 128]) #feature size 3x3 to have 8x8 image after convolution
+#         b_conv3 = bias_variable([128])
+#         h_conv3 = tf.nn.relu(conv2d(h_pool2, W_conv3) + b_conv3)
 
     # Fully connected layer 1 -- after 2 round of downsampling, our 28x28 image
     # is down to 10x10x64 feature maps -- maps this to 1024 features.
     with tf.name_scope('fc1'):
-        W_fc1 = weight_variable([7 * 7 * 128, 4096]) #4096 = first power of 2 larger than 2500 (=50x50), also (8*8*128 = 8192)/2
+        W_fc1 = weight_variable([9 * 9 * 64, 4096]) #4096 = first power of 2 larger than 2500 (=50x50), also (8*8*128 = 8192)/2
         b_fc1 = bias_variable([4096])
 
         # h_pool2_flat = tf.reshape(h_conv2, [-1, 10 * 10 * 64])
-        h_conv3_flat = tf.reshape(h_conv3, [-1, 7 * 7 * 128])
+        h_conv3_flat = tf.reshape(h_pool2, [-1, 9 * 9 * 64])
         h_fc1 = tf.nn.relu(tf.matmul(h_conv3_flat, W_fc1) + b_fc1)
 
     # Dropout - controls the complexity of the model, prevents co-adaptation of
     # features.
-    # with tf.name_scope('dropout'): #maybe add dropout to other layers aswell?
-    #     h_fc1_drop = tf.nn.dropout(h_fc1, keep_prob)
+    with tf.name_scope('dropout'): #maybe add dropout to other layers aswell?
+        h_fc1_drop = tf.nn.dropout(h_fc1, keep_prob)
 
     # Map the 4096 features to 3 classes, one for each direction
     with tf.name_scope('fc2'):
@@ -84,7 +84,7 @@ def deepnn(x, keep_prob):
         b_fc2 = bias_variable([3])
 
         # y_conv = tf.matmul(h_fc1_drop, W_fc2) + b_fc2
-        y_conv = tf.matmul(h_fc1, W_fc2) + b_fc2
+        y_conv = tf.matmul(h_fc1_drop, W_fc2) + b_fc2
 
     #regularizer = tf.nn.l2_loss(W_conv1) + tf.nn.l2_loss(W_conv2) + tf.nn.l2_loss(W_fc1) + tf.nn.l2_loss(W_fc2)
     # regularizer = tf.nn.l2_loss(W_fc0) + tf.nn.l2_loss(W_conv1) + tf.nn.l2_loss(W_conv2) + tf.nn.l2_loss(W_fc1) + tf.nn.l2_loss(W_fc2)
@@ -153,15 +153,17 @@ def main(_):
 
     startTime = time.time()
 
-    amountOfMiniBatchFilesToTrain = 139
+    amountOfMiniBatchFilesToTrain = 50
     amountOfMiniBatchFilesToValidate = 1
     amountOfMiniBatchFilesToTest = 15 #was 2
-    starting_learning_rate = 1e-3 #5*1e-4  #was 1e-3
-    mini_batch_size = 500   #was 500
+    starting_learning_rate = 1e-4 #5*1e-4  #was 1e-3
+    mini_batch_size = 1024   #was 500
     numEpochs = 50
     dataFileNumber = 14 #was 3, then 5
     innerFolder = ""
     keep_prob_start = 0.5
+    biasRatio = 6
+    biasDecayFreq = 1
 
     print("dataFileNumber: " + str(dataFileNumber))
     print("amountOfMiniBatchFilesToTrain: " + str(amountOfMiniBatchFilesToTrain))
@@ -171,10 +173,12 @@ def main(_):
     print ("mini batch size: "+str(mini_batch_size))
     print ("epochs to be trained: " +str(numEpochs))
     print ("keep_prob_start: " + str(keep_prob_start))
+    print ("starting bias ratio: " + str(biasRatio))
+    print ("keep_prob_start: " + str(biasDecayFreq))
 #    sys.stdout.flush()
 
     global_step = tf.Variable(0, trainable=False)
-    learning_rate = tf.train.exponential_decay(starting_learning_rate, global_step, 1000, 0.96, staircase=True)
+    learning_rate = starting_learning_rate #tf.train.exponential_decay(starting_learning_rate, global_step, 1000, 0.96, staircase=True)
     confusion = np.zeros([3,3])
     with tf.device('/gpu:0'):
 
@@ -230,27 +234,91 @@ def main(_):
         saver = tf.train.Saver()
         sess.run(tf.global_variables_initializer())
 
-        validationBatchData = [np.load(fileLocation + "validationData/"+ innerFolder + 'validationDataBoards' + str(1) + ".npy"),
-                     np.load(fileLocation + "validationData/" + innerFolder  + 'validationDataMoves' + str(1) + ".npy")]
-
+        validationBatchDataStraight = [np.load(fileLocation + "validationData/" + 'validationDataBoardsStraight' + str(1) + ".npy"),
+                     np.load(fileLocation + "validationData/" + 'validationDataMovesStraight' + str(1) + ".npy")]
+        validationBatchDataLeft = [np.load(fileLocation + "validationData/"+ 'validationDataBoardsLeft' + str(1) + ".npy"),
+                     np.load(fileLocation + "validationData/" + 'validationDataMovesLeft' + str(1) + ".npy")]
+        validationBatchDataRight = [np.load(fileLocation + "validationData/"+ 'validationDataBoardsRight' + str(1) + ".npy"),                     np.load(fileLocation + "validationData/"  + 'validationDataMovesRight' + str(1) + ".npy")]
+        
+        validationDataShuffle = np.array(range(len(validationBatchDataStraight[0]) + len(validationBatchDataLeft[0]) + len(validationBatchDataRight[0])))
+        np.random.shuffle(validationDataShuffle)
+        validationBatchData = [np.concatenate((validationBatchDataStraight[0] , validationBatchDataLeft[0] , validationBatchDataRight[0]))[validationDataShuffle] , np.concatenate((validationBatchDataStraight[1] , validationBatchDataLeft[1] , validationBatchDataRight[1]))[validationDataShuffle]]
         validationBatchDataBiased = [np.load("/mnt/snake/snakeNN/snakeNN_data11/validationData/"+ innerFolder + 'validationDataBoards' + str(1) + ".npy"),
                      np.load("/mnt/snake/snakeNN/snakeNN_data11/validationData/" + innerFolder + 'validationDataMoves' + str(1) + ".npy")]
         # final_confusion = np.zeros([3,3])
         print ("variables initialized, starting training...\n")
 #        for i in range(1,amountOfMiniBatchFilesToTrain + 1):
         for epoch in range(numEpochs):
-            for i in range(1,amountOfMiniBatchFilesToTrain + 1):
+            if(epoch%biasDecayFreq == 0):
+                biasRatio = biasRatio - 1
+
+            straightAllFiles = sorted(os.listdir(fileLocation + "trainingData/"+ "straight/"))
+            leftAllFiles = sorted(os.listdir(fileLocation + "trainingData/"+ "left/"))
+            rightAllFiles = sorted(os.listdir(fileLocation + "trainingData/"+ "right/"))
+            
+            straightAllBoardFiles = straightAllFiles[:int(len(straightFiles)/2)]
+            straightAllMoveFiles = straightAllFiles[int(len(straightFiles)/2):]
+            leftAllBoardFiles = leftAllFiles[:int(len(leftFiles)/2)]
+            leftAllMoveFiles = leftAllFiles[int(len(leftFiles)/2):]
+            rightAllBoardFiles = rightAllFiles[:int(len(rightFiles)/2)]
+            rightAllMoveFiles = rightAllFiles[int(len(rightFiles)/2):]
+
+            straightFileShuffle = np.array(range(len(straightAllBoardFiles)))
+            np.random.shuffle(straightFileShuffle)
+            straightAllBoardFiles = np.array(straightAllBoardFiles)[straightFileShuffle]
+            straightAllMoveFiles = np.array(straightAllMoveFiles)[straightFileShuffle]
+
+            leftFileShuffle = np.array(range(len(leftAllBoardFiles)))
+            np.random.shuffle(leftFileShuffle)
+            leftAllBoardFiles = np.array(leftAllBoardFiles)[leftFileShuffle]
+            leftAllMoveFiles = np.array(leftAllMoveFiles)[leftFileShuffle]
+
+            rightFileShuffle = np.array(range(len(rightAllBoardFiles)))
+            np.random.shuffle(rightFileShuffle)
+            rightAllBoardFiles = np.array(rightAllBoardFiles)[rightFileShuffle]
+            rightAllMoveFiles = np.array(rightAllMoveFiles)[rightFileShuffle]
+
+            straightAllBoardFilesSplit = np.array_split(straightAllBoardFiles, biasRatio)
+            straightAllMoveFilesSplit = np.array_split(straightAllMoveFiles, biasRatio)
+            straightAllBoardFilesSplit = np.concatenate((straightAllBoardFilesSplit, straightAllBoardFilesSplit[:(biasRatio-len(straightAllBoardFilesSplit)%biasRatio])))
+            straightAllMoveFilesSplit = np.concatenate((straightAllMoveFilesSplit, straightAllMoveFilesSplit[:(biasRatio-len(straightAllMoveFilesSplit)%biasRatio])))
+            
+            if (min(len(leftAllBoardFiles),len(rightAllBoardFiles)) < len(straightAllBoardFiles)[0]):
+                leftAllBoardFiles = np.tile(leftAllBoardFiles , (int(len(straightAllBoardFiles[0])/len(leftAllBoardFiles)) + 1))
+                leftAllMoveFiles = np.tile(leftAllMoveFiles , (int(len(straightAllMoveFiles[0])/len(leftAllMoveFiles)) + 1))
+                rightAllBoardFiles = np.tile(rightAllBoardFiles , (int(len(straightAllBoardFiles[0])/len(rightAllBoardFiles)) + 1))
+                rightAllMoveFiles = np.tile(rightAllMoveFiles , (int(len(straightAllMoveFiles[0])/len(rightAllMoveFiles)) + 1))
+            else:
+                straightAllBoardFiles = np.tile(straightAllBoardFiles , (int(max(len(leftAllBoardFiles),len(rightAllBoardFiles))/len(straightAllBoardFiles)) + 1))
+                straightAllMoveFiles = np.tile(straightAllMoveFiles , (int(max(len(leftAllMoveFiles),len(rightAllMoveFiles))/len(straightAllMoveFiles)) + 1)) 
+
+            for i,((straightBoardFile, straightMoveFile),(leftBoardFile, leftMoveFile),(rightBoardFile, rightMoveFile)) in\
+                enumerate(zip(zip(zip(*straightAllBoardFiles), zip(*straightAllMoveFiles)),\
+                zip(leftAllBoardFiles, leftAllMoveFiles),\
+                zip(rightAllBoardFiles, rightAllMoveFiles))):
             #if i>70:
                 #starting_learning_rate = 5*1e-5
-                batchData = [np.load(fileLocation + "trainingData/"+ innerFolder + 'trainingDataBoards' + str(i) + ".npy"),
-                             np.load(fileLocation + "trainingData/" + innerFolder + 'trainingDataMoves' + str(i) + ".npy")]
+                batchDataStraight = [\
+                                        np.concatenate([np.load(fileLocation + "trainingData/" + "straight/" + boardFile) for boardFile in straightBoardFile]),\
+                                        [np.concatenate(np.load(fileLocation + "trainingData/" + "straight/" + moveFile) for moveFile in straightMoveFile])]
+                
+                batchDataLeft = [np.load(fileLocation + "trainingData/"+ "left/" + leftBoardFile),
+                             np.load(fileLocation + "trainingData/" + "left/" + leftMoveFile)]
+                batchDataRight = [np.load(fileLocation + "trainingData/"+ "right/" + rightBoardFile),
+                             np.load(fileLocation + "trainingData/" + "right/" + rightMoveFile)]
+
+                dataShuffle = np.array(range(len(batchDataStraight[0]) + len(batchDataLeft[0]) + len(batchDataRight[0])))
+                np.random.shuffle(dataShuffle)
+
+ #               print("aaaaaaaaaaaaa" + str(batchDataStraight[1].shape) + " " + str(batchDataLeft[1].shape) + " " +str(batchDataRight[1].shape))
+                batchData = [np.concatenate((batchDataStraight[0] , batchDataLeft[0] , batchDataRight[0]))[dataShuffle] , np.concatenate((batchDataStraight[1] , batchDataLeft[1] , batchDataRight[1]))[dataShuffle]]
 #            for epoch in range(numEpochs):
-                rearrange = np.array(range(len(batchData[0])))
-                np.random.shuffle(rearrange)
-                print("minibatch file: " + str(i) + " epoch " + str(epoch + 1) + " started training.\tglobal step is: " + str(global_step.eval()) + "\tlearning rate is: " + str(learning_rate.eval()) + "\ttime passed: " + str(time.time() - startTime))
+                #rearrange = np.array(range(len(batchData[0])))
+                #np.random.shuffle(rearrange)
+                print("minibatch file: " + str(i) + " epoch " + str(epoch + 1) + " started training.\tglobal step is: " + str(global_step.eval()) + "\tlearning rate is: " + str(learning_rate) + "\ttime passed: " + str(time.time() - startTime))
                 sys.stdout.flush()
                 # miniBatchGenerator = batchGenerator([batchData[0][rearrange],batchData[1][rearrange]], mini_batch_size)
-                for miniBatch in batchGenerator([batchData[0][rearrange],batchData[1][rearrange]], mini_batch_size):
+                for miniBatch in batchGenerator(batchData, mini_batch_size):
                     train_step.run(
                         feed_dict={x: miniBatch[0],
                                    y_: miniBatch[1],
@@ -259,7 +327,7 @@ def main(_):
                     #global_step = global_step + 1
             #print("minibatch file: " + str(i) + " started validation. time passed: "+ str(time.time()-startTime))
 
-                if (global_step.eval())%2000 == 0 or epoch == numEpochs-1:
+                if (global_step.eval())%(120*15) == 0 or epoch == numEpochs-1:
                     print("global step: " + str(global_step.eval()) + " started validation on SLR. time passed: "+ str(time.time()-startTime))
                     sys.stdout.flush()
                     sumOfValidations = 0
