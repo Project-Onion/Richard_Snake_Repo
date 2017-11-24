@@ -14,6 +14,7 @@ import datetime
 
 import random
 import os
+import threading
 
 import numpy as np
 import tensorflow as tf
@@ -33,7 +34,7 @@ FLAGS = tf.app.flags.FLAGS
 
 def deepnn(x, keep_prob):
     with tf.name_scope('reshape'):
-        x_image = tf.reshape(x, [-1, 50, 50, 3])
+        x_image = tf.reshape(x, [-1, 52, 52, 3])
 
     # First convolutional layer - maps one grayscale image to 32 feature maps.
     with tf.name_scope('conv1'):
@@ -58,19 +59,19 @@ def deepnn(x, keep_prob):
          h_pool2 = max_pool_2x2(h_conv2) #now size will be 9x9x64
 
     # Third convolutional layer -- maps 32 feature maps to 64.
-    with tf.name_scope('conv3'):
-         W_conv3 = weight_variable([3, 3, 64, 128]) #feature size 3x3 to have 8x8 image after convolution
-         b_conv3 = bias_variable([128])
-         h_conv3 = tf.nn.relu(conv2d(h_pool2, W_conv3) + b_conv3)
+#    with tf.name_scope('conv3'):
+#         W_conv3 = weight_variable([3, 3, 64, 128]) #feature size 3x3 to have 8x8 image after convolution
+#         b_conv3 = bias_variable([128])
+#         h_conv3 = tf.nn.relu(conv2d(h_pool2, W_conv3) + b_conv3)
 
     # Fully connected layer 1 -- after 2 round of downsampling, our 28x28 image
     # is down to 10x10x64 feature maps -- maps this to 1024 features.
     with tf.name_scope('fc1'):
-        W_fc1 = weight_variable([7 * 7 * 128, 4096]) #4096 = first power of 2 larger than 2500 (=50x50), also (8*8*128 = 8192)/2
+        W_fc1 = weight_variable([9 * 9 * 64, 4096]) #4096 = first power of 2 larger than 2500 (=50x50), also (8*8*128 = 8192)/2
         b_fc1 = bias_variable([4096])
 
         # h_pool2_flat = tf.reshape(h_conv2, [-1, 10 * 10 * 64])
-        h_conv3_flat = tf.reshape(h_pool2, [-1, 7 * 7 * 128])
+        h_conv3_flat = tf.reshape(h_pool2, [-1, 9 * 9 * 64])
         h_fc1 = tf.nn.relu(tf.matmul(h_conv3_flat, W_fc1) + b_fc1)
 
     # Dropout - controls the complexity of the model, prevents co-adaptation of
@@ -180,12 +181,12 @@ def main(_):
 #    sys.stdout.flush()
 
     global_step = tf.Variable(0, trainable=False)
-    learning_rate = tf.train.exponential_decay(starting_learning_rate, global_step, 2000, 0.96, staircase=True)
+    learning_rate = tf.train.exponential_decay(starting_learning_rate, global_step, 6000, 0.96, staircase=True)  #was 10000 timesteps
     confusion = np.zeros([3,3])
     with tf.device('/gpu:0'):
 
         # Create the model
-        x = tf.placeholder(tf.float32, [None, 2500*3], name="x")
+        x = tf.placeholder(tf.float32, [None, 2704*3], name="x")
 
         # Define loss and optimizer
         y_ = tf.placeholder(tf.float32, [None, 3], name="y")
@@ -323,7 +324,6 @@ def main(_):
                 zip(rightAllBoardFiles, rightAllMoveFiles))):
             #if i>70:
                 #starting_learning_rate = 5*1e-5
-                loadDataTime = time.time()
                 batchDataStraight = [\
                                         np.concatenate([np.load(fileLocation + "trainingData/" + "straight/" + boardFile) for boardFile in straightBoardFile]),\
                                         np.concatenate([np.load(fileLocation + "trainingData/" + "straight/" + moveFile) for moveFile in straightMoveFile])]
@@ -341,27 +341,28 @@ def main(_):
 #            for epoch in range(numEpochs):
                 #rearrange = np.array(range(len(batchData[0])))
                 #np.random.shuffle(rearrange)
-                print("minibatch file: " + str(i) + " epoch " + str(epoch) + " started training.\tglobal step is: " + str(global_step.eval()) + "\tlearning rate is: " + str(learning_rate.eval()) + "\ttime passed: " + str(time.time() - startTime))
-                sys.stdout.flush()	
+                print("minibatch file: " + str(i) + " epoch " + str(epoch + 1) + " started training.\tglobal step is: " + str(global_step.eval()) + "\tlearning rate is: " + str(learning_rate.eval()) + "\ttime passed: " + str(time.time() - startTime))
+                sys.stdout.flush()
                 # miniBatchGenerator = batchGenerator([batchData[0][rearrange],batchData[1][rearrange]], mini_batch_size)
-                loadDataTime = time.time() - loadDataTime
-                trainStartTime = time.time()
-                gpuTotalTime = 0
+                
+                def train(sess, miniBatch):
+                    train_step.run(session=sess, feed_dict={x: miniBatch[0],\
+                                              y_: miniBatch[1],\
+                                              keep_prob: keep_prob_start})#,
+ 
+                miniBatch0 = next(batchGenerator(batchData, mini_batch_size))
+                trainThread = threading.Thread(target=train, args=(sess, miniBatch0))
+                trainThread.start()
                 for miniBatch in batchGenerator(batchData, mini_batch_size):
-                    gpuStartTime = time.time()
-                    train_step.run(
-                        feed_dict={x: miniBatch[0],
-                                   y_: miniBatch[1],
-                                   keep_prob: keep_prob_start})#,
-#                                   learning_rate: starting_learning_rate})
-                    gpuTotalTime = gpuTotalTime + (time.time() - gpuStartTime)
-#                writer = tf.summary.FileWriter("/mnt/snake/snakeNN/snakeNN_code/tensorBoard/1")
-#                writer.add_graph(sess.graph)
-#                print("aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa")
+                    trainThread.join()
+                    trainThread = threading.Thread(target=train, args=(sess, miniBatch))
+                    trainThread.start()
 
+                trainThread.join()
+#                                   learning_rate: starting_learning_rate})
                     #global_step = global_step + 1
             #print("minibatch file: " + str(i) + " started validation. time passed: "+ str(time.time()-startTime))
-                print ("minibatch file: " + str(i) + " epoch " + str(epoch) + "\tload data time: "  +str(loadDataTime) + "\ttotal train time: " + str(time.time()-trainStartTime) + "\tGPU train time: " + str(gpuTotalTime)) 
+
                 if (global_step.eval()-global_step_start)%(((20000/mini_batch_size)*(biasRatio+2))*15) == 0 or epoch == numEpochs-1:
                     print("global step: " + str(global_step.eval()) + " started validation on SLR. time passed: "+ str(time.time()-startTime))
                     sys.stdout.flush()
@@ -369,19 +370,29 @@ def main(_):
                     amountOfValidations = 0
                     final_confusion = np.zeros([3,3])
             # validationMiniBatchGenerator = batchGenerator(validationBatchData, mini_batch_size)
-                    for miniBatch in batchGenerator(validationBatchData, mini_batch_size):
-                        validate_accuracy = accuracy.eval(feed_dict={
+
+                    def validate(sess, miniBatch):
+                        validate_accuracy = accuracy.eval(session=sess, feed_dict={
                             x: miniBatch[0],
                             y_: miniBatch[1],
                             keep_prob: 1.0})#,
  #                   learning_rate: starting_learning_rate})
-                        final_confusion = final_confusion + confusion.eval(feed_dict={
+                        final_confusion = final_confusion + confusion.eval(session=sess, feed_dict={
                             x: miniBatch[0],
                             y_: miniBatch[1],
                             keep_prob: 1.0})
                 # print('epoch %d, training accuracy %g' % (epoch, train_accuracy))
                         sumOfValidations = sumOfValidations + validate_accuracy
                         amountOfValidations = amountOfValidations + 1
+
+                    miniBatch0 = next(batchGenerator(validationBatchData, mini_batch_size))
+                    validateThread = threading.Thread(target=validate, args=(sess, miniBatch0))
+                    validateThread.start()
+                    for miniBatch in batchGenerator(validationBatchData, mini_batch_size):
+                        validateThread.join()
+                        validateThread = threading.Thread(target=validate, args=(sess, miniBatch))
+                        validateThread.start()
+                    validateThread.join()
                 #print (validate_accuracy)
 
             #print("minibatch file "+ str(i+1) + "/" +str(amountOfMiniBatchFilesToTrain) +  " validation: "  + str(sumOfValidations/amountOfValidations))
@@ -462,9 +473,6 @@ def main(_):
         save_path = saver.save(sess, 'models/output_snake_model_final'+now.strftime("%Y%m%d_%H%M%S"))
         print("Model saved in file: %s" % save_path)
         sys.stdout.flush()
-
-        writer = tf.summery.FileWriter("/mnt/snake/snakeNN/snakeNN_code/tensorBoard/1")
-        writer.add_graph(sess.graph)
 
 
 if __name__ == '__main__':
