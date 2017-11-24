@@ -1,0 +1,183 @@
+
+
+ --- STARTING CODE ---
+------------------------
+dataFileNumber: 14
+amountOfMiniBatchFilesToTrain: 50
+amountOfMiniBatchFilesToValidate: 1
+amountOfMiniBatchFilesToTest: 15
+starting learning rate: 1e-06
+mini batch size: 500
+epochs to be trained: 400
+keep_prob_start: 0.5
+starting bias ratio: 1
+bias decay frequency: 1
+bias ratio limit: 4
+Saving graph to: /tmp/tmpWlW2Lw
+
+starting session
+variables initialized, starting training...
+
+straights in first group: 50	 straights in last group: 50
+amount of straights: 50	 amount of left: 50	 amount of rights: 50
+minibatch file: 0 epoch 1 started training.	global step is: 0	learning rate is: 1e-06	time passed: 92.6942610741
+minibatch file: 1 epoch 1 started training.	global step is: 120	learning rate is: 1e-06	time passed: 475.780852079
+minibatch file: 2 epoch 1 started training.	global step is: 240	learning rate is: 1e-06	time passed: 852.377264977
+minibatch file: 3 epoch 1 started training.	global step is: 360	learning rate is: 1e-06	time passed: 1230.31486797
+minibatch file: 4 epoch 1 started training.	global step is: 480	learning rate is: 1e-06	time passed: 1607.63401294
+minibatch file: 5 epoch 1 started training.	global step is: 600	learning rate is: 1e-06	time passed: 1984.1901381
+minibatch file: 6 epoch 1 started training.	global step is: 720	learning rate is: 1e-06	time passed: 2362.02456212
+minibatch file: 7 epoch 1 started training.	global step is: 840	learning rate is: 1e-06	time passed: 2737.14499307
+minibatch file: 8 epoch 1 started training.	global step is: 960	learning rate is: 1e-06	time passed: 3113.83844304
+minibatch file: 9 epoch 1 started training.	global step is: 1080	learning rate is: 1e-06	time passed: 3495.25504613
+minibatch file: 10 epoch 1 started training.	global step is: 1200	learning rate is: 1e-06	time passed: 3874.13423109
+minibatch file: 11 epoch 1 started training.	global step is: 1320	learning rate is: 1e-06	time passed: 4251.46215701
+minibatch file: 12 epoch 1 started training.	global step is: 1440	learning rate is: 1e-06	time passed: 4628.28866315
+minibatch file: 13 epoch 1 started training.	global step is: 1560	learning rate is: 1e-06	time passed: 5006.31910205
+minibatch file: 14 epoch 1 started training.	global step is: 1680	learning rate is: 1e-06	time passed: 5385.96126914
+global step: 1800 started validation on SLR. time passed: 5717.44355416
+global step 1800 validation on SLR data: 0.38870000119
+global step 1800 confusion matrix on SLR data:
+[[  6599.   9489.   3912.]
+ [  4967.  10908.   4125.]
+ [  4674.   9511.   5815.]]
+global step: 1800 started validation on biased data. time passed: 5999.44212008
+global step 1800 validation on biased data: 0.494149995595
+global step 1800 confusion matrix on biased data:
+[[  806.  1026.   454.]
+ [ 3797.  8384.  3256.]
+ [  557.  1027.   693.]]
+Model saved in file: models/output_snake_model_20171121_094128-1800
+minibatch file: 15 epoch 1 started training.	global step is: 1800	learning rate is: 1e-06	time passed: 6178.404953
+minibatch file: 16 epoch 1 started training.	global step is: 1920	learning rate is: 1e-06	time passed: 6566.61195898
+minibatch file: 17 epoch 1 started training.	global step is: 2040	learning rate is: 1e-06	time passed: 6946.20961404
+minibatch file: 18 epoch 1 started training.	global step is: 2160	learning rate is: 1e-06	time passed: 7331.931113
+minibatch file: 19 epoch 1 started training.	global step is: 2280	learning rate is: 1e-06	time passed: 7729.34748507
+minibatch file: 20 epoch 1 started training.	global step is: 2400	learning rate is: 1e-06	time passed: 8136.61205411
+minibatch file: 21 epoch 1 started training.	global step is: 2520	learning rate is: 1e-06	time passed: 8543.34241295
+minibatch file: 22 epoch 1 started training.	global step is: 2640	learning rate is: 1e-06	time passed: 8945.99121594
+minibatch file: 23 epoch 1 started training.	global step is: 2760	learning rate is: 1e-06	time passed: 9345.55698204
+minibatch file: 24 epoch 1 started training.	global step is: 2880	learning rate is: 1e-06	time passed: 9744.57091212
+minibatch file: 25 epoch 1 started training.	global step is: 3000	learning rate is: 1e-06	time passed: 10146.1244609
+minibatch file: 26 epoch 1 started training.	global step is: 3120	learning rate is: 1e-06	time passed: 10544.45368
+minibatch file: 27 epoch 1 started training.	global step is: 3240	learning rate is: 1e-06	time passed: 10941.632607
+minibatch file: 28 epoch 1 started training.	global step is: 3360	learning rate is: 1e-06	time passed: 11344.6916761
+minibatch file: 29 epoch 1 started training.	global step is: 3480	learning rate is: 1e-06	time passed: 11745.360049
+global step: 3600 started validation on SLR. time passed: 12076.4050181
+global step 3600 validation on SLR data: 0.397199998051
+global step 3600 confusion matrix on SLR data:
+[[  5858.   9762.   4380.]
+ [  4166.  11326.   4508.]
+ [  3873.   9479.   6648.]]
+global step: 3600 started validation on biased data. time passed: 12359.9007981
+global step 3600 validation on biased data: 0.511749997735
+global step 3600 confusion matrix on biased data:
+[[  689.  1075.   522.]
+ [ 3114.  8780.  3543.]
+ [  429.  1082.   766.]]
+Model saved in file: models/output_snake_model_20171121_112729-3600
+minibatch file: 30 epoch 1 started training.	global step is: 3600	learning rate is: 1e-06	time passed: 12544.729722
+minibatch file: 31 epoch 1 started training.	global step is: 3720	learning rate is: 1e-06	time passed: 12957.9863071
+minibatch file: 32 epoch 1 started training.	global step is: 3840	learning rate is: 1e-06	time passed: 13361.9176772
+minibatch file: 33 epoch 1 started training.	global step is: 3960	learning rate is: 1e-06	time passed: 13764.2664101
+minibatch file: 34 epoch 1 started training.	global step is: 4080	learning rate is: 1e-06	time passed: 14166.1244531
+minibatch file: 35 epoch 1 started training.	global step is: 4200	learning rate is: 1e-06	time passed: 14559.4726081
+minibatch file: 36 epoch 1 started training.	global step is: 4320	learning rate is: 1e-06	time passed: 14960.227839
+minibatch file: 37 epoch 1 started training.	global step is: 4440	learning rate is: 1e-06	time passed: 15367.1331611
+minibatch file: 38 epoch 1 started training.	global step is: 4560	learning rate is: 1e-06	time passed: 15752.925482
+minibatch file: 39 epoch 1 started training.	global step is: 4680	learning rate is: 1e-06	time passed: 16147.3373041
+minibatch file: 40 epoch 1 started training.	global step is: 4800	learning rate is: 1e-06	time passed: 16546.9827831
+minibatch file: 41 epoch 1 started training.	global step is: 4920	learning rate is: 1e-06	time passed: 16944.695976
+minibatch file: 42 epoch 1 started training.	global step is: 5040	learning rate is: 1e-06	time passed: 17341.6022921
+minibatch file: 43 epoch 1 started training.	global step is: 5160	learning rate is: 1e-06	time passed: 17746.5646582
+minibatch file: 44 epoch 1 started training.	global step is: 5280	learning rate is: 1e-06	time passed: 18141.6254702
+global step: 5400 started validation on SLR. time passed: 18472.278827
+global step 5400 validation on SLR data: 0.399049998075
+global step 5400 confusion matrix on SLR data:
+[[  6329.   9671.   4000.]
+ [  4401.  11423.   4176.]
+ [  4179.   9630.   6191.]]
+global step: 5400 started validation on biased data. time passed: 18754.3542871
+global step 5400 validation on biased data: 0.519699989259
+global step 5400 confusion matrix on biased data:
+[[  738.  1076.   472.]
+ [ 3346.  8915.  3176.]
+ [  465.  1071.   741.]]
+Model saved in file: models/output_snake_model_20171121_131404-5400
+minibatch file: 45 epoch 1 started training.	global step is: 5400	learning rate is: 1e-06	time passed: 18930.5010831
+minibatch file: 46 epoch 1 started training.	global step is: 5520	learning rate is: 1e-06	time passed: 19334.0884809
+minibatch file: 47 epoch 1 started training.	global step is: 5640	learning rate is: 1e-06	time passed: 19739.853138
+minibatch file: 48 epoch 1 started training.	global step is: 5760	learning rate is: 1e-06	time passed: 20142.7898409
+minibatch file: 49 epoch 1 started training.	global step is: 5880	learning rate is: 1e-06	time passed: 20549.3875501
+bias ratio changed to: 2
+straights in first group: 650	 straights in last group: 650
+amount of straights: 1300	 amount of left: 50	 amount of rights: 50
+minibatch file: 0 epoch 2 started training.	global step is: 6000	learning rate is: 1e-06	time passed: 20942.8879321
+minibatch file: 1 epoch 2 started training.	global step is: 6160	learning rate is: 1e-06	time passed: 21448.7524281
+minibatch file: 2 epoch 2 started training.	global step is: 6320	learning rate is: 1e-06	time passed: 21950.8203571
+minibatch file: 3 epoch 2 started training.	global step is: 6480	learning rate is: 1e-06	time passed: 22481.8844631
+minibatch file: 4 epoch 2 started training.	global step is: 6640	learning rate is: 1e-06	time passed: 23016.8794861
+minibatch file: 5 epoch 2 started training.	global step is: 6800	learning rate is: 1e-06	time passed: 23545.1350691
+minibatch file: 6 epoch 2 started training.	global step is: 6960	learning rate is: 1e-06	time passed: 24079.1777341
+minibatch file: 7 epoch 2 started training.	global step is: 7120	learning rate is: 1e-06	time passed: 24719.5638142
+minibatch file: 8 epoch 2 started training.	global step is: 7280	learning rate is: 1e-06	time passed: 25340.06106
+minibatch file: 9 epoch 2 started training.	global step is: 7440	learning rate is: 1e-06	time passed: 25978.0097589
+minibatch file: 10 epoch 2 started training.	global step is: 7600	learning rate is: 1e-06	time passed: 26623.68786
+minibatch file: 11 epoch 2 started training.	global step is: 7760	learning rate is: 1e-06	time passed: 27281.212889
+minibatch file: 12 epoch 2 started training.	global step is: 7920	learning rate is: 1e-06	time passed: 27950.132143
+minibatch file: 13 epoch 2 started training.	global step is: 8080	learning rate is: 1e-06	time passed: 28601.9573681
+minibatch file: 14 epoch 2 started training.	global step is: 8240	learning rate is: 1e-06	time passed: 29228.5673461
+global step: 8400 started validation on SLR. time passed: 29680.286092
+global step 8400 validation on SLR data: 0.368449998895
+global step 8400 confusion matrix on SLR data:
+[[  2738.  15747.   1515.]
+ [  1602.  17025.   1373.]
+ [  1859.  15797.   2344.]]
+global step: 8400 started validation on biased data. time passed: 29968.441293
+global step 8400 validation on biased data: 0.686349993944
+global step 8400 confusion matrix on biased data:
+[[   330.   1785.    171.]
+ [  1267.  13131.   1039.]
+ [   216.   1795.    266.]]
+Model saved in file: models/output_snake_model_20171121_162101-8400
+minibatch file: 15 epoch 2 started training.	global step is: 8400	learning rate is: 1e-06	time passed: 30755.7158589
+minibatch file: 16 epoch 2 started training.	global step is: 8560	learning rate is: 1e-06	time passed: 31262.7030501
+minibatch file: 17 epoch 2 started training.	global step is: 8720	learning rate is: 1e-06	time passed: 31790.5311131
+minibatch file: 18 epoch 2 started training.	global step is: 8880	learning rate is: 1e-06	time passed: 32322.9168911
+minibatch file: 19 epoch 2 started training.	global step is: 9040	learning rate is: 1e-06	time passed: 32856.7302861
+minibatch file: 20 epoch 2 started training.	global step is: 9200	learning rate is: 1e-06	time passed: 33391.9193151
+minibatch file: 21 epoch 2 started training.	global step is: 9360	learning rate is: 1e-06	time passed: 33924.423949
+minibatch file: 22 epoch 2 started training.	global step is: 9520	learning rate is: 1e-06	time passed: 34455.603934
+minibatch file: 23 epoch 2 started training.	global step is: 9680	learning rate is: 1e-06	time passed: 34958.1217711
+minibatch file: 24 epoch 2 started training.	global step is: 9840	learning rate is: 1e-06	time passed: 35460.270256
+minibatch file: 25 epoch 2 started training.	global step is: 10000	learning rate is: 9.6e-07	time passed: 35965.716429
+minibatch file: 26 epoch 2 started training.	global step is: 10160	learning rate is: 9.6e-07	time passed: 36471.7768571
+minibatch file: 27 epoch 2 started training.	global step is: 10320	learning rate is: 9.6e-07	time passed: 37005.1755509
+minibatch file: 28 epoch 2 started training.	global step is: 10480	learning rate is: 9.6e-07	time passed: 37535.569356
+minibatch file: 29 epoch 2 started training.	global step is: 10640	learning rate is: 9.6e-07	time passed: 38063.919733
+global step: 10800 started validation on SLR. time passed: 38504.368453
+global step 10800 validation on SLR data: 0.366899999728
+global step 10800 confusion matrix on SLR data:
+[[  3634.  14057.   2309.]
+ [  2539.  15273.   2188.]
+ [  2698.  14195.   3107.]]
+global step: 10800 started validation on biased data. time passed: 38787.2776191
+global step 10800 validation on biased data: 0.630499994755
+global step 10800 confusion matrix on biased data:
+[[   424.   1592.    270.]
+ [  1907.  11834.   1696.]
+ [   317.   1608.    352.]]
+Model saved in file: models/output_snake_model_20171121_184756-10800
+minibatch file: 30 epoch 2 started training.	global step is: 10800	learning rate is: 9.6e-07	time passed: 38976.454016
+minibatch file: 31 epoch 2 started training.	global step is: 10960	learning rate is: 9.6e-07	time passed: 39509.6270831
+minibatch file: 32 epoch 2 started training.	global step is: 11120	learning rate is: 9.6e-07	time passed: 40039.8499451
+minibatch file: 33 epoch 2 started training.	global step is: 11280	learning rate is: 9.6e-07	time passed: 40577.9303122
+minibatch file: 34 epoch 2 started training.	global step is: 11440	learning rate is: 9.6e-07	time passed: 41112.78122
+minibatch file: 35 epoch 2 started training.	global step is: 11600	learning rate is: 9.6e-07	time passed: 41645.0755341
+minibatch file: 36 epoch 2 started training.	global step is: 11760	learning rate is: 9.6e-07	time passed: 42177.00352
+minibatch file: 37 epoch 2 started training.	global step is: 11920	learning rate is: 9.6e-07	time passed: 42722.475899
+minibatch file: 38 epoch 2 started training.	global step is: 12080	learning rate is: 9.6e-07	time passed: 43226.2502131
+minibatch file: 39 epoch 2 started training.	global step is: 12240	learning rate is: 9.6e-07	time passed: 43760.6759222
+minibatch file: 40 epoch 2 started training.	global step is: 12400	learning rate is: 9.6e-07	time passed: 44286.889529
+minibatch file: 41 epoch 2 started training.	global step is: 12560	learning rate is: 9.6e-07	time passed: 44820.186789
+minibatch file: 42 epoch 2 started training.	global step is: 12720	learning rate is: 9.6e-07	time passed: 45354.830807
