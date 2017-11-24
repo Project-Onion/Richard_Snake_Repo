@@ -1,0 +1,407 @@
+
+
+ --- STARTING CODE ---
+------------------------
+dataFileNumber: 14
+amountOfMiniBatchFilesToTrain: 50
+amountOfMiniBatchFilesToValidate: 1
+amountOfMiniBatchFilesToTest: 15
+starting learning rate: 0.0005
+mini batch size: 500
+epochs to be trained: 400
+keep_prob_start: 0.5
+starting bias ratio: 1
+bias decay frequency: 1
+bias ratio limit: 4
+Saving graph to: /tmp/tmpdJpy_2
+
+starting session
+variables initialized, starting training...
+
+straights in first group: 50	 straights in last group: 50
+amount of straights: 50	 amount of left: 50	 amount of rights: 50
+minibatch file: 0 epoch 0 started training.	global step is: 0	learning rate is: 0.0005	time passed: 102.364839077
+minibatch file: 0 epoch 0	load data time: 50.5811378956	total train time: 256.798279047	GPU train time: 9.49406504631
+minibatch file: 1 epoch 0 started training.	global step is: 120	learning rate is: 0.0005	time passed: 405.02335906
+minibatch file: 1 epoch 0	load data time: 45.8597991467	total train time: 255.040262938	GPU train time: 8.47645926476
+minibatch file: 2 epoch 0 started training.	global step is: 240	learning rate is: 0.0005	time passed: 707.633020878
+minibatch file: 2 epoch 0	load data time: 47.5691380501	total train time: 253.978528023	GPU train time: 8.47702527046
+minibatch file: 3 epoch 0 started training.	global step is: 360	learning rate is: 0.0005	time passed: 1009.44184899
+minibatch file: 3 epoch 0	load data time: 47.8298017979	total train time: 253.408917189	GPU train time: 8.46486353874
+minibatch file: 4 epoch 0 started training.	global step is: 480	learning rate is: 0.0005	time passed: 1310.66874409
+minibatch file: 4 epoch 0	load data time: 47.8175530434	total train time: 256.169192076	GPU train time: 8.48535728455
+minibatch file: 5 epoch 0 started training.	global step is: 600	learning rate is: 0.0005	time passed: 1614.41045308
+minibatch file: 5 epoch 0	load data time: 47.5720369816	total train time: 251.669462204	GPU train time: 8.46239423752
+minibatch file: 6 epoch 0 started training.	global step is: 720	learning rate is: 0.0005	time passed: 1913.21392989
+minibatch file: 6 epoch 0	load data time: 47.1335949898	total train time: 253.599406958	GPU train time: 8.47712683678
+minibatch file: 7 epoch 0 started training.	global step is: 840	learning rate is: 0.0005	time passed: 2213.98098207
+minibatch file: 7 epoch 0	load data time: 47.1671669483	total train time: 253.126984835	GPU train time: 8.47625660896
+minibatch file: 8 epoch 0 started training.	global step is: 960	learning rate is: 0.0005	time passed: 2514.58385897
+minibatch file: 8 epoch 0	load data time: 47.475620985	total train time: 254.319046021	GPU train time: 8.47596979141
+minibatch file: 9 epoch 0 started training.	global step is: 1080	learning rate is: 0.0005	time passed: 2816.40582395
+minibatch file: 9 epoch 0	load data time: 47.5024938583	total train time: 253.904934168	GPU train time: 8.4666826725
+minibatch file: 10 epoch 0 started training.	global step is: 1200	learning rate is: 0.0005	time passed: 3117.94216704
+minibatch file: 10 epoch 0	load data time: 47.6310770512	total train time: 254.366125107	GPU train time: 8.48782491684
+minibatch file: 11 epoch 0 started training.	global step is: 1320	learning rate is: 0.0005	time passed: 3419.94903398
+minibatch file: 11 epoch 0	load data time: 47.6404469013	total train time: 256.566786051	GPU train time: 8.49657249451
+minibatch file: 12 epoch 0 started training.	global step is: 1440	learning rate is: 0.0005	time passed: 3724.701401
+minibatch file: 12 epoch 0	load data time: 48.1853132248	total train time: 254.389468908	GPU train time: 8.48613786697
+minibatch file: 13 epoch 0 started training.	global step is: 1560	learning rate is: 0.0005	time passed: 4025.74559903
+minibatch file: 13 epoch 0	load data time: 46.6543569565	total train time: 254.795336962	GPU train time: 8.49539208412
+minibatch file: 14 epoch 0 started training.	global step is: 1680	learning rate is: 0.0005	time passed: 4328.17956901
+minibatch file: 14 epoch 0	load data time: 47.6382148266	total train time: 255.132898808	GPU train time: 8.48049712181
+global step: 1800 started validation on SLR. time passed: 4583.31324291
+global step 1800 validation on SLR data: 0.45036666592
+global step 1800 confusion matrix on SLR data:
+[[  8474.   8013.   3513.]
+ [  4914.  11021.   4065.]
+ [  4394.   8079.   7527.]]
+global step: 1800 started validation on biased data. time passed: 4835.82529593
+global step 1800 validation on biased data: 0.521499994397
+global step 1800 confusion matrix on biased data:
+[[  979.   890.   417.]
+ [ 3646.  8562.  3229.]
+ [  492.   896.   889.]]
+Model saved in file: models/output_snake_model_20171121_220142-1800
+minibatch file: 15 epoch 0 started training.	global step is: 1800	learning rate is: 0.0005	time passed: 4977.94996285
+minibatch file: 15 epoch 0	load data time: 55.1535551548	total train time: 253.704921007	GPU train time: 8.46528482437
+minibatch file: 16 epoch 0 started training.	global step is: 1920	learning rate is: 0.0005	time passed: 5284.65119386
+minibatch file: 16 epoch 0	load data time: 52.9959659576	total train time: 255.367417812	GPU train time: 8.48605370522
+minibatch file: 17 epoch 0 started training.	global step is: 2040	learning rate is: 0.0005	time passed: 5589.33522701
+minibatch file: 17 epoch 0	load data time: 49.3161900043	total train time: 252.635704041	GPU train time: 8.47029876709
+minibatch file: 18 epoch 0 started training.	global step is: 2160	learning rate is: 0.0005	time passed: 5891.68805194
+minibatch file: 18 epoch 0	load data time: 49.7168021202	total train time: 253.02443099	GPU train time: 8.46312022209
+minibatch file: 19 epoch 0 started training.	global step is: 2280	learning rate is: 0.0005	time passed: 6195.32838988
+minibatch file: 19 epoch 0	load data time: 50.6155519485	total train time: 252.792627096	GPU train time: 8.47663164139
+minibatch file: 20 epoch 0 started training.	global step is: 2400	learning rate is: 0.0005	time passed: 6497.80813503
+minibatch file: 20 epoch 0	load data time: 49.6867029667	total train time: 253.056723118	GPU train time: 8.48004579544
+minibatch file: 21 epoch 0 started training.	global step is: 2520	learning rate is: 0.0005	time passed: 6797.98751903
+minibatch file: 21 epoch 0	load data time: 47.1222951412	total train time: 254.273828983	GPU train time: 8.48206305504
+minibatch file: 22 epoch 0 started training.	global step is: 2640	learning rate is: 0.0005	time passed: 7100.52015591
+minibatch file: 22 epoch 0	load data time: 48.2583611012	total train time: 254.567251921	GPU train time: 8.49147439003
+minibatch file: 23 epoch 0 started training.	global step is: 2760	learning rate is: 0.0005	time passed: 7402.72766209
+minibatch file: 23 epoch 0	load data time: 47.639840126	total train time: 253.658792019	GPU train time: 8.49814939499
+minibatch file: 24 epoch 0 started training.	global step is: 2880	learning rate is: 0.0005	time passed: 7703.702456
+minibatch file: 24 epoch 0	load data time: 47.3155939579	total train time: 254.871212006	GPU train time: 8.49521875381
+minibatch file: 25 epoch 0 started training.	global step is: 3000	learning rate is: 0.0005	time passed: 8007.28260303
+minibatch file: 25 epoch 0	load data time: 48.7085459232	total train time: 253.809780121	GPU train time: 8.49151134491
+minibatch file: 26 epoch 0 started training.	global step is: 3120	learning rate is: 0.0005	time passed: 8309.33730793
+minibatch file: 26 epoch 0	load data time: 48.2444980145	total train time: 252.455914974	GPU train time: 8.49540829659
+minibatch file: 27 epoch 0 started training.	global step is: 3240	learning rate is: 0.0005	time passed: 8610.64586401
+minibatch file: 27 epoch 0	load data time: 48.8521208763	total train time: 253.861844063	GPU train time: 8.46405315399
+minibatch file: 28 epoch 0 started training.	global step is: 3360	learning rate is: 0.0005	time passed: 8912.43421197
+minibatch file: 28 epoch 0	load data time: 47.9261028767	total train time: 254.094521999	GPU train time: 8.47169542313
+minibatch file: 29 epoch 0 started training.	global step is: 3480	learning rate is: 0.0005	time passed: 9213.60188699
+minibatch file: 29 epoch 0	load data time: 47.0727190971	total train time: 253.522619009	GPU train time: 8.46400165558
+global step: 3600 started validation on SLR. time passed: 9467.12504697
+global step 3600 validation on SLR data: 0.469766664505
+global step 3600 confusion matrix on SLR data:
+[[ 10116.   6635.   3249.]
+ [  5776.  10264.   3960.]
+ [  5263.   6931.   7806.]]
+global step: 3600 started validation on biased data. time passed: 9719.92050695
+global step 3600 validation on biased data: 0.503099995106
+global step 3600 confusion matrix on biased data:
+[[ 1163.   744.   379.]
+ [ 4368.  8007.  3062.]
+ [  579.   806.   892.]]
+Model saved in file: models/output_snake_model_20171121_232306-3600
+minibatch file: 30 epoch 0 started training.	global step is: 3600	learning rate is: 0.0005	time passed: 9860.56422591
+minibatch file: 30 epoch 0	load data time: 53.3152039051	total train time: 255.66415596	GPU train time: 8.47672629356
+minibatch file: 31 epoch 0 started training.	global step is: 3720	learning rate is: 0.0005	time passed: 10165.2624319
+minibatch file: 31 epoch 0	load data time: 49.03368783	total train time: 253.739202023	GPU train time: 8.49294400215
+minibatch file: 32 epoch 0 started training.	global step is: 3840	learning rate is: 0.0005	time passed: 10465.1202979
+minibatch file: 32 epoch 0	load data time: 46.1181550026	total train time: 254.395848989	GPU train time: 8.47604107857
+minibatch file: 33 epoch 0 started training.	global step is: 3960	learning rate is: 0.0005	time passed: 10765.761183
+minibatch file: 33 epoch 0	load data time: 46.2447309494	total train time: 253.932636023	GPU train time: 8.47944688797
+minibatch file: 34 epoch 0 started training.	global step is: 4080	learning rate is: 0.0005	time passed: 11066.0821719
+minibatch file: 34 epoch 0	load data time: 46.3879220486	total train time: 256.041501045	GPU train time: 8.48635816574
+minibatch file: 35 epoch 0 started training.	global step is: 4200	learning rate is: 0.0005	time passed: 11369.4301679
+minibatch file: 35 epoch 0	load data time: 47.3059930801	total train time: 254.678012848	GPU train time: 8.49355912209
+minibatch file: 36 epoch 0 started training.	global step is: 4320	learning rate is: 0.0005	time passed: 11671.571811
+minibatch file: 36 epoch 0	load data time: 47.4633100033	total train time: 254.072335958	GPU train time: 8.49443554878
+minibatch file: 37 epoch 0 started training.	global step is: 4440	learning rate is: 0.0005	time passed: 11972.7548499
+minibatch file: 37 epoch 0	load data time: 47.110460043	total train time: 253.57108593	GPU train time: 8.49184560776
+minibatch file: 38 epoch 0 started training.	global step is: 4560	learning rate is: 0.0005	time passed: 12273.184907
+minibatch file: 38 epoch 0	load data time: 46.8586399555	total train time: 253.247831821	GPU train time: 8.4801607132
+minibatch file: 39 epoch 0 started training.	global step is: 4680	learning rate is: 0.0005	time passed: 12571.835469
+minibatch file: 39 epoch 0	load data time: 45.4023010731	total train time: 254.936178923	GPU train time: 8.49704480171
+minibatch file: 40 epoch 0 started training.	global step is: 4800	learning rate is: 0.0005	time passed: 12874.030349
+minibatch file: 40 epoch 0	load data time: 47.2584359646	total train time: 256.14109993	GPU train time: 8.50138092041
+minibatch file: 41 epoch 0 started training.	global step is: 4920	learning rate is: 0.0005	time passed: 13177.1970389
+minibatch file: 41 epoch 0	load data time: 47.0253100395	total train time: 253.961041927	GPU train time: 8.49360585213
+minibatch file: 42 epoch 0 started training.	global step is: 5040	learning rate is: 0.0005	time passed: 13477.7576931
+minibatch file: 42 epoch 0	load data time: 46.5991919041	total train time: 255.38293314	GPU train time: 8.49921584129
+minibatch file: 43 epoch 0 started training.	global step is: 5160	learning rate is: 0.0005	time passed: 13779.9935429
+minibatch file: 43 epoch 0	load data time: 46.8525660038	total train time: 254.01859808	GPU train time: 8.4848241806
+minibatch file: 44 epoch 0 started training.	global step is: 5280	learning rate is: 0.0005	time passed: 14080.156729
+minibatch file: 44 epoch 0	load data time: 46.1442170143	total train time: 253.512057066	GPU train time: 8.4889330864
+global step: 5400 started validation on SLR. time passed: 14333.669333
+global step 5400 validation on SLR data: 0.508216661712
+global step 5400 confusion matrix on SLR data:
+[[ 10220.   3462.   6318.]
+ [  5033.   7614.   7353.]
+ [  3919.   3422.  12659.]]
+global step: 5400 started validation on biased data. time passed: 14587.2518249
+global step 5400 validation on biased data: 0.442300001532
+global step 5400 confusion matrix on biased data:
+[[ 1173.   442.   671.]
+ [ 3784.  6240.  5413.]
+ [  458.   386.  1433.]]
+Model saved in file: models/output_snake_model_20171122_004414-5400
+minibatch file: 45 epoch 0 started training.	global step is: 5400	learning rate is: 0.0005	time passed: 14728.3054409
+minibatch file: 45 epoch 0	load data time: 53.5578098297	total train time: 252.884509802	GPU train time: 8.49063062668
+minibatch file: 46 epoch 0 started training.	global step is: 5520	learning rate is: 0.0005	time passed: 15030.2436681
+minibatch file: 46 epoch 0	load data time: 49.0533227921	total train time: 252.295666933	GPU train time: 8.47606921196
+minibatch file: 47 epoch 0 started training.	global step is: 5640	learning rate is: 0.0005	time passed: 15328.764159
+minibatch file: 47 epoch 0	load data time: 46.2244029045	total train time: 255.619573116	GPU train time: 8.48948979378
+minibatch file: 48 epoch 0 started training.	global step is: 5760	learning rate is: 0.0005	time passed: 15631.9672029
+minibatch file: 48 epoch 0	load data time: 47.5831329823	total train time: 254.059298038	GPU train time: 8.48799777031
+minibatch file: 49 epoch 0 started training.	global step is: 5880	learning rate is: 0.0005	time passed: 15933.4452529
+minibatch file: 49 epoch 0	load data time: 47.4182860851	total train time: 254.169425011	GPU train time: 8.49068903923
+bias ratio changed to: 2
+straights in first group: 650	 straights in last group: 650
+amount of straights: 1300	 amount of left: 50	 amount of rights: 50
+minibatch file: 0 epoch 1 started training.	global step is: 6000	learning rate is: 0.0005	time passed: 16249.097116
+minibatch file: 0 epoch 1	load data time: 61.4784448147	total train time: 339.497690916	GPU train time: 11.3132762909
+minibatch file: 1 epoch 1 started training.	global step is: 6160	learning rate is: 0.0005	time passed: 16650.2489281
+minibatch file: 1 epoch 1	load data time: 61.6538631916	total train time: 338.508727074	GPU train time: 11.3010406494
+minibatch file: 2 epoch 1 started training.	global step is: 6320	learning rate is: 0.0005	time passed: 17049.5777431
+minibatch file: 2 epoch 1	load data time: 60.8196520805	total train time: 339.669644833	GPU train time: 11.3197929859
+minibatch file: 3 epoch 1 started training.	global step is: 6480	learning rate is: 0.0005	time passed: 17449.497438
+minibatch file: 3 epoch 1	load data time: 60.2496240139	total train time: 338.890753984	GPU train time: 11.3195517063
+minibatch file: 4 epoch 1 started training.	global step is: 6640	learning rate is: 0.0005	time passed: 17850.0104859
+minibatch file: 4 epoch 1	load data time: 61.621984005	total train time: 339.430825949	GPU train time: 11.3172123432
+minibatch file: 5 epoch 1 started training.	global step is: 6800	learning rate is: 0.0005	time passed: 18248.7967169
+minibatch file: 5 epoch 1	load data time: 59.355137825	total train time: 339.206375837	GPU train time: 11.3151273727
+minibatch file: 6 epoch 1 started training.	global step is: 6960	learning rate is: 0.0005	time passed: 18648.166594
+minibatch file: 6 epoch 1	load data time: 60.1631951332	total train time: 338.908870935	GPU train time: 11.3168299198
+minibatch file: 7 epoch 1 started training.	global step is: 7120	learning rate is: 0.0005	time passed: 19047.3938971
+minibatch file: 7 epoch 1	load data time: 60.3180470467	total train time: 339.152303934	GPU train time: 11.3227889538
+minibatch file: 8 epoch 1 started training.	global step is: 7280	learning rate is: 0.0005	time passed: 19447.5905509
+minibatch file: 8 epoch 1	load data time: 61.0439209938	total train time: 337.042562008	GPU train time: 11.309296608
+minibatch file: 9 epoch 1 started training.	global step is: 7440	learning rate is: 0.0005	time passed: 19845.5523751
+minibatch file: 9 epoch 1	load data time: 60.9188170433	total train time: 337.778317928	GPU train time: 11.3168165684
+minibatch file: 10 epoch 1 started training.	global step is: 7600	learning rate is: 0.0005	time passed: 20243.347728
+minibatch file: 10 epoch 1	load data time: 60.0166521072	total train time: 338.439733028	GPU train time: 11.3099877834
+minibatch file: 11 epoch 1 started training.	global step is: 7760	learning rate is: 0.0005	time passed: 20641.452487
+minibatch file: 11 epoch 1	load data time: 59.6646602154	total train time: 339.408927917	GPU train time: 11.3131916523
+minibatch file: 12 epoch 1 started training.	global step is: 7920	learning rate is: 0.0005	time passed: 21040.8231471
+minibatch file: 12 epoch 1	load data time: 59.9613349438	total train time: 339.267158031	GPU train time: 11.3140730858
+minibatch file: 13 epoch 1 started training.	global step is: 8080	learning rate is: 0.0005	time passed: 21440.434958
+minibatch file: 13 epoch 1	load data time: 60.3442080021	total train time: 338.195199013	GPU train time: 11.3083107471
+minibatch file: 14 epoch 1 started training.	global step is: 8240	learning rate is: 0.0005	time passed: 21839.8796561
+minibatch file: 14 epoch 1	load data time: 61.2490639687	total train time: 339.170911074	GPU train time: 11.3220775127
+global step: 8400 started validation on SLR. time passed: 22179.050981
+global step 8400 validation on SLR data: 0.542983329048
+global step 8400 confusion matrix on SLR data:
+[[  9687.   7842.   2471.]
+ [  3075.  14439.   2486.]
+ [  3513.   8034.   8453.]]
+global step: 8400 started validation on biased data. time passed: 22432.538703
+global step 8400 validation on biased data: 0.687100000679
+global step 8400 confusion matrix on biased data:
+[[  1059.    982.    245.]
+ [  2123.  11746.   1568.]
+ [   365.    975.    937.]]
+Model saved in file: models/output_snake_model_20171122_025458-8400
+minibatch file: 15 epoch 1 started training.	global step is: 8400	learning rate is: 0.0005	time passed: 22587.306196
+minibatch file: 15 epoch 1	load data time: 68.3390300274	total train time: 339.205291986	GPU train time: 11.3145167828
+minibatch file: 16 epoch 1 started training.	global step is: 8560	learning rate is: 0.0005	time passed: 22987.937108
+minibatch file: 16 epoch 1	load data time: 61.425314188	total train time: 337.54752183	GPU train time: 11.3028709888
+minibatch file: 17 epoch 1 started training.	global step is: 8720	learning rate is: 0.0005	time passed: 23386.812088
+minibatch file: 17 epoch 1	load data time: 61.3270881176	total train time: 337.29410696	GPU train time: 11.3224887848
+minibatch file: 18 epoch 1 started training.	global step is: 8880	learning rate is: 0.0005	time passed: 23785.3079131
+minibatch file: 18 epoch 1	load data time: 61.2012591362	total train time: 337.652863026	GPU train time: 11.3045225143
+minibatch file: 19 epoch 1 started training.	global step is: 9040	learning rate is: 0.0005	time passed: 24182.7383089
+minibatch file: 19 epoch 1	load data time: 59.7771081924	total train time: 338.558156967	GPU train time: 11.3279895782
+minibatch file: 20 epoch 1 started training.	global step is: 9200	learning rate is: 0.0005	time passed: 24582.9098229
+minibatch file: 20 epoch 1	load data time: 61.6129169464	total train time: 338.683236837	GPU train time: 11.3043718338
+minibatch file: 21 epoch 1 started training.	global step is: 9360	learning rate is: 0.0005	time passed: 24982.1316419
+minibatch file: 21 epoch 1	load data time: 60.5382637978	total train time: 340.693082809	GPU train time: 11.3210802078
+minibatch file: 22 epoch 1 started training.	global step is: 9520	learning rate is: 0.0005	time passed: 25383.0312791
+minibatch file: 22 epoch 1	load data time: 60.206307888	total train time: 340.678981781	GPU train time: 11.3239824772
+minibatch file: 23 epoch 1 started training.	global step is: 9680	learning rate is: 0.0005	time passed: 25785.468426
+minibatch file: 23 epoch 1	load data time: 61.7576699257	total train time: 338.471843004	GPU train time: 11.3176717758
+minibatch file: 24 epoch 1 started training.	global step is: 9840	learning rate is: 0.0005	time passed: 26184.434237
+minibatch file: 24 epoch 1	load data time: 60.4935500622	total train time: 342.133440018	GPU train time: 11.3253948689
+minibatch file: 25 epoch 1 started training.	global step is: 10000	learning rate is: 0.00048	time passed: 26587.5546129
+minibatch file: 25 epoch 1	load data time: 60.9865920544	total train time: 342.256032944	GPU train time: 11.3169357777
+minibatch file: 26 epoch 1 started training.	global step is: 10160	learning rate is: 0.00048	time passed: 26990.4125769
+minibatch file: 26 epoch 1	load data time: 60.6014649868	total train time: 337.641452074	GPU train time: 11.304800272
+minibatch file: 27 epoch 1 started training.	global step is: 10320	learning rate is: 0.00048	time passed: 27387.7305319
+minibatch file: 27 epoch 1	load data time: 59.6761078835	total train time: 341.031823158	GPU train time: 11.3198902607
+minibatch file: 28 epoch 1 started training.	global step is: 10480	learning rate is: 0.00048	time passed: 27788.6288791
+minibatch file: 28 epoch 1	load data time: 59.8662040234	total train time: 338.120003939	GPU train time: 11.3147256374
+minibatch file: 29 epoch 1 started training.	global step is: 10640	learning rate is: 0.00048	time passed: 28187.2803209
+minibatch file: 29 epoch 1	load data time: 60.5311980247	total train time: 337.592698097	GPU train time: 11.3121511936
+global step: 10800 started validation on SLR. time passed: 28524.8735869
+global step 10800 validation on SLR data: 0.557283324252
+global step 10800 confusion matrix on SLR data:
+[[  8695.   8463.   2842.]
+ [  2183.  15525.   2292.]
+ [  2676.   8107.   9217.]]
+global step: 10800 started validation on biased data. time passed: 28778.9800351
+global step 10800 validation on biased data: 0.7255500108
+global step 10800 confusion matrix on biased data:
+[[   904.   1096.    286.]
+ [  1405.  12665.   1367.]
+ [   289.   1046.    942.]]
+Model saved in file: models/output_snake_model_20171122_044045-10800
+minibatch file: 30 epoch 1 started training.	global step is: 10800	learning rate is: 0.00048	time passed: 28933.6255329
+minibatch file: 30 epoch 1	load data time: 67.5699598789	total train time: 337.865004063	GPU train time: 11.314902544
+minibatch file: 31 epoch 1 started training.	global step is: 10960	learning rate is: 0.00048	time passed: 29332.9345949
+minibatch file: 31 epoch 1	load data time: 61.4435379505	total train time: 337.783159018	GPU train time: 11.3017430305
+minibatch file: 32 epoch 1 started training.	global step is: 11120	learning rate is: 0.00048	time passed: 29730.4090269
+minibatch file: 32 epoch 1	load data time: 59.6909310818	total train time: 337.832153797	GPU train time: 11.3139536381
+minibatch file: 33 epoch 1 started training.	global step is: 11280	learning rate is: 0.00048	time passed: 30128.998596
+minibatch file: 33 epoch 1	load data time: 60.7568898201	total train time: 338.711592913	GPU train time: 11.3156037331
+minibatch file: 34 epoch 1 started training.	global step is: 11440	learning rate is: 0.00048	time passed: 30528.4134219
+minibatch file: 34 epoch 1	load data time: 60.7029349804	total train time: 337.694857121	GPU train time: 11.3256194592
+minibatch file: 35 epoch 1 started training.	global step is: 11600	learning rate is: 0.00048	time passed: 30927.178777
+minibatch file: 35 epoch 1	load data time: 61.0700690746	total train time: 340.090833902	GPU train time: 11.3215324879
+minibatch file: 36 epoch 1 started training.	global step is: 11760	learning rate is: 0.00048	time passed: 31327.5698209
+minibatch file: 36 epoch 1	load data time: 60.2997989655	total train time: 340.259277105	GPU train time: 11.3298640251
+minibatch file: 37 epoch 1 started training.	global step is: 11920	learning rate is: 0.00048	time passed: 31726.8949161
+minibatch file: 37 epoch 1	load data time: 59.0655150414	total train time: 339.844816208	GPU train time: 11.3062677383
+minibatch file: 38 epoch 1 started training.	global step is: 12080	learning rate is: 0.00048	time passed: 32126.2087851
+minibatch file: 38 epoch 1	load data time: 59.4687190056	total train time: 339.131664038	GPU train time: 11.3189034462
+minibatch file: 39 epoch 1 started training.	global step is: 12240	learning rate is: 0.00048	time passed: 32524.9857399
+minibatch file: 39 epoch 1	load data time: 59.6449260712	total train time: 337.961899996	GPU train time: 11.3066146374
+minibatch file: 40 epoch 1 started training.	global step is: 12400	learning rate is: 0.00048	time passed: 32923.841567
+minibatch file: 40 epoch 1	load data time: 60.8936500549	total train time: 338.157421112	GPU train time: 11.3082110882
+minibatch file: 41 epoch 1 started training.	global step is: 12560	learning rate is: 0.00048	time passed: 33323.1824601
+minibatch file: 41 epoch 1	load data time: 61.1830499172	total train time: 338.494634151	GPU train time: 11.3321125507
+minibatch file: 42 epoch 1 started training.	global step is: 12720	learning rate is: 0.00048	time passed: 33723.0045869
+minibatch file: 42 epoch 1	load data time: 61.3272089958	total train time: 338.780426025	GPU train time: 11.3117127419
+minibatch file: 43 epoch 1 started training.	global step is: 12880	learning rate is: 0.00048	time passed: 34121.9511139
+minibatch file: 43 epoch 1	load data time: 60.1657440662	total train time: 337.480453968	GPU train time: 11.3183810711
+minibatch file: 44 epoch 1 started training.	global step is: 13040	learning rate is: 0.00048	time passed: 34519.9066811
+minibatch file: 44 epoch 1	load data time: 60.4746978283	total train time: 339.552921057	GPU train time: 11.3232233524
+global step: 13200 started validation on SLR. time passed: 34859.460592
+global step 13200 validation on SLR data: 0.586116663615
+global step 13200 confusion matrix on SLR data:
+[[ 10893.   6103.   3004.]
+ [  3204.  14128.   2668.]
+ [  3122.   6732.  10146.]]
+global step: 13200 started validation on biased data. time passed: 35111.69175
+global step 13200 validation on biased data: 0.686050009727
+global step 13200 confusion matrix on biased data:
+[[  1158.    790.    338.]
+ [  2228.  11476.   1733.]
+ [   334.    856.   1087.]]
+Model saved in file: models/output_snake_model_20171122_062618-13200
+minibatch file: 45 epoch 1 started training.	global step is: 13200	learning rate is: 0.00048	time passed: 35266.9997339
+minibatch file: 45 epoch 1	load data time: 68.0782499313	total train time: 338.857832909	GPU train time: 11.3099176884
+minibatch file: 46 epoch 1 started training.	global step is: 13360	learning rate is: 0.00048	time passed: 35666.2423871
+minibatch file: 46 epoch 1	load data time: 60.384529829	total train time: 338.301753044	GPU train time: 11.3105278015
+minibatch file: 47 epoch 1 started training.	global step is: 13520	learning rate is: 0.00048	time passed: 36064.7116749
+minibatch file: 47 epoch 1	load data time: 60.1672320366	total train time: 338.608324051	GPU train time: 11.2970564365
+minibatch file: 48 epoch 1 started training.	global step is: 13680	learning rate is: 0.00048	time passed: 36464.468926
+minibatch file: 48 epoch 1	load data time: 61.1486520767	total train time: 340.461493015	GPU train time: 11.3126308918
+minibatch file: 49 epoch 1 started training.	global step is: 13840	learning rate is: 0.00048	time passed: 36865.2429159
+minibatch file: 49 epoch 1	load data time: 60.3121881485	total train time: 338.361572027	GPU train time: 11.2831473351
+bias ratio changed to: 1
+straights in first group: 50	 straights in last group: 50
+amount of straights: 50	 amount of left: 50	 amount of rights: 50
+minibatch file: 0 epoch 2 started training.	global step is: 14000	learning rate is: 0.00048	time passed: 37249.3972321
+minibatch file: 0 epoch 2	load data time: 45.7896311283	total train time: 255.199234009	GPU train time: 8.50263166428
+minibatch file: 1 epoch 2 started training.	global step is: 14120	learning rate is: 0.00048	time passed: 37550.162868
+minibatch file: 1 epoch 2	load data time: 45.5659980774	total train time: 256.06122303	GPU train time: 8.50028014183
+minibatch file: 2 epoch 2 started training.	global step is: 14240	learning rate is: 0.00048	time passed: 37852.010437
+minibatch file: 2 epoch 2	load data time: 45.785900116	total train time: 255.760428905	GPU train time: 8.49374318123
+minibatch file: 3 epoch 2 started training.	global step is: 14360	learning rate is: 0.00048	time passed: 38154.159801
+minibatch file: 3 epoch 2	load data time: 46.388422966	total train time: 255.292076111	GPU train time: 8.49666905403
+minibatch file: 4 epoch 2 started training.	global step is: 14480	learning rate is: 0.00048	time passed: 38455.229594
+minibatch file: 4 epoch 2	load data time: 45.7773258686	total train time: 253.981530905	GPU train time: 8.48306894302
+minibatch file: 5 epoch 2 started training.	global step is: 14600	learning rate is: 0.00048	time passed: 38755.0892
+minibatch file: 5 epoch 2	load data time: 45.8777589798	total train time: 254.860117912	GPU train time: 8.48904323578
+minibatch file: 6 epoch 2 started training.	global step is: 14720	learning rate is: 0.00048	time passed: 39056.438894
+minibatch file: 6 epoch 2	load data time: 46.4891338348	total train time: 254.22141099	GPU train time: 8.49571847916
+minibatch file: 7 epoch 2 started training.	global step is: 14840	learning rate is: 0.00048	time passed: 39357.173955
+minibatch file: 7 epoch 2	load data time: 46.5134060383	total train time: 254.964221954	GPU train time: 8.50112581253
+minibatch file: 8 epoch 2 started training.	global step is: 14960	learning rate is: 0.00048	time passed: 39658.583827
+minibatch file: 8 epoch 2	load data time: 46.4451880455	total train time: 254.491877079	GPU train time: 8.48715305328
+minibatch file: 9 epoch 2 started training.	global step is: 15080	learning rate is: 0.00048	time passed: 39959.047787
+minibatch file: 9 epoch 2	load data time: 45.9715731144	total train time: 253.945248842	GPU train time: 8.50572228432
+minibatch file: 10 epoch 2 started training.	global step is: 15200	learning rate is: 0.00048	time passed: 40259.1433659
+minibatch file: 10 epoch 2	load data time: 46.1500141621	total train time: 255.388912916	GPU train time: 8.48249959946
+minibatch file: 11 epoch 2 started training.	global step is: 15320	learning rate is: 0.00048	time passed: 40562.0358949
+minibatch file: 11 epoch 2	load data time: 47.5033209324	total train time: 254.325280905	GPU train time: 8.49643325806
+minibatch file: 12 epoch 2 started training.	global step is: 15440	learning rate is: 0.00048	time passed: 40865.932179
+minibatch file: 12 epoch 2	load data time: 49.5706949234	total train time: 255.027151823	GPU train time: 8.49415397644
+minibatch file: 13 epoch 2 started training.	global step is: 15560	learning rate is: 0.00048	time passed: 41167.325681
+minibatch file: 13 epoch 2	load data time: 46.3658430576	total train time: 255.030431986	GPU train time: 8.49218559265
+minibatch file: 14 epoch 2 started training.	global step is: 15680	learning rate is: 0.00048	time passed: 41468.1271279
+minibatch file: 14 epoch 2	load data time: 45.7704789639	total train time: 256.498064041	GPU train time: 8.49792599678
+global step: 15800 started validation on SLR. time passed: 41724.6257501
+global step 15800 validation on SLR data: 0.602266669273
+global step 15800 confusion matrix on SLR data:
+[[ 11834.   3741.   4425.]
+ [  4167.  11179.   4654.]
+ [  3184.   3693.  13123.]]
+global step: 15800 started validation on biased data. time passed: 41978.492512
+global step 15800 validation on biased data: 0.583799989522
+global step 15800 confusion matrix on biased data:
+[[ 1315.   451.   520.]
+ [ 3040.  8883.  3514.]
+ [  358.   441.  1478.]]
+Model saved in file: models/output_snake_model_20171122_082045-15800
+minibatch file: 15 epoch 2 started training.	global step is: 15800	learning rate is: 0.00048	time passed: 42117.9613509
+minibatch file: 15 epoch 2	load data time: 52.4048609734	total train time: 252.895525932	GPU train time: 8.48461270332
+minibatch file: 16 epoch 2 started training.	global step is: 15920	learning rate is: 0.00048	time passed: 42417.0206749
+minibatch file: 16 epoch 2	load data time: 46.1633908749	total train time: 255.021260977	GPU train time: 8.49169421196
+minibatch file: 17 epoch 2 started training.	global step is: 16040	learning rate is: 0.00048	time passed: 42718.621598
+minibatch file: 17 epoch 2	load data time: 46.5792639256	total train time: 251.782195091	GPU train time: 8.48737287521
+minibatch file: 18 epoch 2 started training.	global step is: 16160	learning rate is: 0.00048	time passed: 43016.4092469
+minibatch file: 18 epoch 2	load data time: 46.0051159859	total train time: 254.640679836	GPU train time: 8.4894258976
+minibatch file: 19 epoch 2 started training.	global step is: 16280	learning rate is: 0.00048	time passed: 43317.270632
+minibatch file: 19 epoch 2	load data time: 46.2203068733	total train time: 253.039558887	GPU train time: 8.48215985298
+minibatch file: 20 epoch 2 started training.	global step is: 16400	learning rate is: 0.00048	time passed: 43616.2883739
+minibatch file: 20 epoch 2	load data time: 45.9778301716	total train time: 255.008019924	GPU train time: 8.48110103607
+minibatch file: 21 epoch 2 started training.	global step is: 16520	learning rate is: 0.00048	time passed: 43917.8468249
+minibatch file: 21 epoch 2	load data time: 46.5500369072	total train time: 252.950457096	GPU train time: 8.4815132618
+minibatch file: 22 epoch 2 started training.	global step is: 16640	learning rate is: 0.00048	time passed: 44216.593061
+minibatch file: 22 epoch 2	load data time: 45.7954230309	total train time: 254.050675869	GPU train time: 8.47804307938
+minibatch file: 23 epoch 2 started training.	global step is: 16760	learning rate is: 0.00048	time passed: 44516.598232
+minibatch file: 23 epoch 2	load data time: 45.9541139603	total train time: 254.402734995	GPU train time: 8.48391389847
+minibatch file: 24 epoch 2 started training.	global step is: 16880	learning rate is: 0.00048	time passed: 44817.23014
+minibatch file: 24 epoch 2	load data time: 46.2289130688	total train time: 255.468126059	GPU train time: 8.48031973839
+minibatch file: 25 epoch 2 started training.	global step is: 17000	learning rate is: 0.00048	time passed: 45118.6740699
+minibatch file: 25 epoch 2	load data time: 45.9755029678	total train time: 253.896272898	GPU train time: 8.4753100872
+minibatch file: 26 epoch 2 started training.	global step is: 17120	learning rate is: 0.00048	time passed: 45419.033416
+minibatch file: 26 epoch 2	load data time: 46.4628081322	total train time: 255.812488794	GPU train time: 8.48783779144
+minibatch file: 27 epoch 2 started training.	global step is: 17240	learning rate is: 0.00048	time passed: 45720.6951389
+minibatch file: 27 epoch 2	load data time: 45.8486859798	total train time: 252.627831936	GPU train time: 8.46631121635
+minibatch file: 28 epoch 2 started training.	global step is: 17360	learning rate is: 0.00048	time passed: 46019.57289
+minibatch file: 28 epoch 2	load data time: 46.2495310307	total train time: 254.220963955	GPU train time: 8.47916460037
+minibatch file: 29 epoch 2 started training.	global step is: 17480	learning rate is: 0.00048	time passed: 46320.0113211
+minibatch file: 29 epoch 2	load data time: 46.2172219753	total train time: 255.003230095	GPU train time: 8.48021888733
+global step: 17600 started validation on SLR. time passed: 46575.0152469
+global step 17600 validation on SLR data: 0.601866661509
+global step 17600 confusion matrix on SLR data:
+[[ 13284.   3408.   3308.]
+ [  4814.  10218.   4968.]
+ [  4272.   3118.  12610.]]
+global step: 17600 started validation on biased data. time passed: 46828.4123111
+global step 17600 validation on biased data: 0.569400000572
+global step 17600 confusion matrix on biased data:
+[[ 1466.   435.   385.]
+ [ 3572.  8482.  3383.]
+ [  452.   385.  1440.]]
+Model saved in file: models/output_snake_model_20171122_094134-17600
+minibatch file: 30 epoch 2 started training.	global step is: 17600	learning rate is: 0.00048	time passed: 46968.7684231
+minibatch file: 30 epoch 2	load data time: 53.6061439514	total train time: 252.966550112	GPU train time: 8.47676563263
+minibatch file: 31 epoch 2 started training.	global step is: 17720	learning rate is: 0.00048	time passed: 47268.156707
+minibatch file: 31 epoch 2	load data time: 46.4213480949	total train time: 255.943335056	GPU train time: 8.47749018669
+minibatch file: 32 epoch 2 started training.	global step is: 17840	learning rate is: 0.00048	time passed: 47570.003793
+minibatch file: 32 epoch 2	load data time: 45.9034719467	total train time: 254.613337994	GPU train time: 8.4700782299
+minibatch file: 33 epoch 2 started training.	global step is: 17960	learning rate is: 0.00048	time passed: 47871.6435919
+minibatch file: 33 epoch 2	load data time: 47.0260989666	total train time: 255.27354598	GPU train time: 8.48577284813
+minibatch file: 34 epoch 2 started training.	global step is: 18080	learning rate is: 0.00048	time passed: 48173.711566
+minibatch file: 34 epoch 2	load data time: 46.7941200733	total train time: 252.894853115	GPU train time: 8.47620487213
+minibatch file: 35 epoch 2 started training.	global step is: 18200	learning rate is: 0.00048	time passed: 48472.927681
+minibatch file: 35 epoch 2	load data time: 46.3208100796	total train time: 254.882128	GPU train time: 8.47968530655
+minibatch file: 36 epoch 2 started training.	global step is: 18320	learning rate is: 0.00048	time passed: 48774.5790019
+minibatch file: 36 epoch 2	load data time: 46.7689208984	total train time: 258.734431028	GPU train time: 8.50190019608
+minibatch file: 37 epoch 2 started training.	global step is: 18440	learning rate is: 0.00048	time passed: 49079.9114449
