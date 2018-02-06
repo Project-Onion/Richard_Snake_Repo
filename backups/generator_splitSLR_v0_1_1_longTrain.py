@@ -13,9 +13,9 @@ import sys
 import datetime
 
 import random
-import os
 
 import numpy as np
+
 import tensorflow as tf
 
 
@@ -55,7 +55,7 @@ def deepnn(x, keep_prob):
 
     # Second pooling layer.
     with tf.name_scope('pool2'):
-         h_pool2 = max_pool_2x2(h_conv2) #now size will be 9x9x64
+         h_pool2 = max_pool_2x2(h_conv2) #now size will be 10x10x64
 
     # Third convolutional layer -- maps 32 feature maps to 64.
     with tf.name_scope('conv3'):
@@ -66,7 +66,7 @@ def deepnn(x, keep_prob):
     # Fully connected layer 1 -- after 2 round of downsampling, our 28x28 image
     # is down to 10x10x64 feature maps -- maps this to 1024 features.
     with tf.name_scope('fc1'):
-        W_fc1 = weight_variable([7 * 7 * 128,4096]) #4096 = first power of 2 larger than 2500 (=50x50), also (8*8*128 = 8192)/2
+        W_fc1 = weight_variable([7 * 7 * 128, 4096]) #4096 = first power of 2 larger than 2500 (=50x50), also (8*8*128 = 8192)/2
         b_fc1 = bias_variable([4096])
 
         # h_pool2_flat = tf.reshape(h_conv2, [-1, 10 * 10 * 64])
@@ -75,8 +75,8 @@ def deepnn(x, keep_prob):
 
     # Dropout - controls the complexity of the model, prevents co-adaptation of
     # features.
-    with tf.name_scope('dropout'): #maybe add dropout to other layers aswell?
-        h_fc1_drop = tf.nn.dropout(h_fc1, keep_prob)
+    # with tf.name_scope('dropout'): #maybe add dropout to other layers aswell?
+    #     h_fc1_drop = tf.nn.dropout(h_fc1, keep_prob)
 
     # Map the 4096 features to 3 classes, one for each direction
     with tf.name_scope('fc2'):
@@ -84,7 +84,7 @@ def deepnn(x, keep_prob):
         b_fc2 = bias_variable([3])
 
         # y_conv = tf.matmul(h_fc1_drop, W_fc2) + b_fc2
-        y_conv = tf.matmul(h_fc1_drop, W_fc2) + b_fc2
+        y_conv = tf.matmul(h_fc1, W_fc2) + b_fc2
 
     #regularizer = tf.nn.l2_loss(W_conv1) + tf.nn.l2_loss(W_conv2) + tf.nn.l2_loss(W_fc1) + tf.nn.l2_loss(W_fc2)
     # regularizer = tf.nn.l2_loss(W_fc0) + tf.nn.l2_loss(W_conv1) + tf.nn.l2_loss(W_conv2) + tf.nn.l2_loss(W_fc1) + tf.nn.l2_loss(W_fc2)
@@ -156,15 +156,12 @@ def main(_):
     amountOfMiniBatchFilesToTrain = 50
     amountOfMiniBatchFilesToValidate = 1
     amountOfMiniBatchFilesToTest = 15 #was 2
-    starting_learning_rate = 5*1e-4 #5*1e-4  #was 1e-3
+    starting_learning_rate = 5*1e-4  #was 1e-3
     mini_batch_size = 500   #was 500
-    numEpochs = 20 #400
+    numEpochs = 50
     dataFileNumber = 14 #was 3, then 5
     innerFolder = ""
     keep_prob_start = 0.5
-    biasRatio = 1
-    biasDecayFreq = 1
-    biasRatioLimit = 4
 
     print("dataFileNumber: " + str(dataFileNumber))
     print("amountOfMiniBatchFilesToTrain: " + str(amountOfMiniBatchFilesToTrain))
@@ -174,13 +171,10 @@ def main(_):
     print ("mini batch size: "+str(mini_batch_size))
     print ("epochs to be trained: " +str(numEpochs))
     print ("keep_prob_start: " + str(keep_prob_start))
-    print ("starting bias ratio: " + str(biasRatio))
-    print ("bias decay frequency: " + str(biasDecayFreq))
-    print ("bias ratio limit: " + str(biasRatioLimit))
 #    sys.stdout.flush()
 
     global_step = tf.Variable(0, trainable=False)
-    learning_rate = tf.train.exponential_decay(starting_learning_rate, global_step, 1000, 0.98, staircase=True)
+    learning_rate = starting_learning_rate #tf.train.exponential_decay(starting_learning_rate, global_step, 1000, 0.96, staircase=True)
     confusion = np.zeros([3,3])
     with tf.device('/gpu:0'):
 
@@ -251,118 +245,35 @@ def main(_):
         print ("variables initialized, starting training...\n")
 #        for i in range(1,amountOfMiniBatchFilesToTrain + 1):
         for epoch in range(numEpochs):
-            if(epoch%biasDecayFreq == 0 and epoch !=0 and biasRatio <= biasRatioLimit and biasRatio>=1):
-                if(epoch%4==1):
-                    biasRatio = 2
-                elif(epoch%4==2):
-                    biasRatio = 1
-                elif(epoch%4==3):
-                    biasRatio = 3
-                elif(epoch%4==3):
-                    biasRatio = 4
-
-                print("bias ratio changed to: " + str(biasRatio))
-#		learning_rate = learning_rate/1.5
-
-            straightAllFiles = sorted(os.listdir(fileLocation + "trainingData/"+ "straight/"))
-            leftAllFiles = sorted(os.listdir(fileLocation + "trainingData/"+ "left/"))
-            rightAllFiles = sorted(os.listdir(fileLocation + "trainingData/"+ "right/"))
-            
-            straightAllBoardFiles = straightAllFiles[:int(len(straightAllFiles)/2)]
-            straightAllMoveFiles = straightAllFiles[int(len(straightAllFiles)/2):]
-            leftAllBoardFiles = leftAllFiles[:int(len(leftAllFiles)/2)]
-            leftAllMoveFiles = leftAllFiles[int(len(leftAllFiles)/2):]
-            rightAllBoardFiles = rightAllFiles[:int(len(rightAllFiles)/2)]
-            rightAllMoveFiles = rightAllFiles[int(len(rightAllFiles)/2):]
-
-            straightFileShuffle = np.array(range(len(straightAllBoardFiles)))
-            np.random.shuffle(straightFileShuffle)
-            straightAllBoardFiles = np.array(straightAllBoardFiles)[straightFileShuffle]
-            straightAllMoveFiles = np.array(straightAllMoveFiles)[straightFileShuffle]
-            straightAllBoardFiles = straightAllBoardFiles[:amountOfMiniBatchFilesToTrain]
-            straightAllMoveFiles = straightAllMoveFiles[:amountOfMiniBatchFilesToTrain]
-
-            leftFileShuffle = np.array(range(len(leftAllBoardFiles)))
-            np.random.shuffle(leftFileShuffle)
-            leftAllBoardFiles = np.array(leftAllBoardFiles)[leftFileShuffle]
-            leftAllMoveFiles = np.array(leftAllMoveFiles)[leftFileShuffle]
-            leftAllBoardFiles = leftAllBoardFiles[:amountOfMiniBatchFilesToTrain]
-            leftAllMoveFiles = leftAllMoveFiles[:amountOfMiniBatchFilesToTrain]
-
-            rightFileShuffle = np.array(range(len(rightAllBoardFiles)))
-            np.random.shuffle(rightFileShuffle)
-            rightAllBoardFiles = np.array(rightAllBoardFiles)[rightFileShuffle]
-            rightAllMoveFiles = np.array(rightAllMoveFiles)[rightFileShuffle]
-            rightAllBoardFiles = rightAllBoardFiles[:amountOfMiniBatchFilesToTrain]
-            rightAllMoveFiles = rightAllMoveFiles[:amountOfMiniBatchFilesToTrain]
-
-            straightAllBoardFiles = np.array_split(straightAllBoardFiles, biasRatio)
-            straightAllMoveFiles = np.array_split(straightAllMoveFiles, biasRatio)
-            #straightAllBoardFiles[-1] = np.concatenate((straightAllBoardFiles[-1], straightAllBoardFiles[:(biasRatio-len(straightAllBoardFiles)%biasRatio)%biasRatio]))
-            #straightAllMoveFiles[-1] = np.concatenate((straightAllMoveFiles[-1], straightAllMoveFiles[:(biasRatio-len(straightAllMoveFiles)%biasRatio)%biasRatio]))
-            for i,_ in enumerate(straightAllBoardFiles):
-                if straightAllBoardFiles[i].shape != straightAllBoardFiles[0].shape:
-                    straightAllBoardFiles[i] = np.append(straightAllBoardFiles[i], random.choice(straightAllBoardFiles[i]))
-            
-            if (min(len(leftAllBoardFiles),len(rightAllBoardFiles)) < len(straightAllBoardFiles[0])):
-                leftAllBoardFiles = np.tile(leftAllBoardFiles , (int(len(straightAllBoardFiles[0])/len(leftAllBoardFiles)) + 1))
-                leftAllMoveFiles = np.tile(leftAllMoveFiles , (int(len(straightAllMoveFiles[0])/len(leftAllMoveFiles)) + 1))
-                rightAllBoardFiles = np.tile(rightAllBoardFiles , (int(len(straightAllBoardFiles[0])/len(rightAllBoardFiles)) + 1))
-                rightAllMoveFiles = np.tile(rightAllMoveFiles , (int(len(straightAllMoveFiles[0])/len(rightAllMoveFiles)) + 1))
-            elif (min(len(leftAllBoardFiles),len(rightAllBoardFiles)) > len(straightAllBoardFiles[0])):
-                straightAllBoardFiles = np.tile(straightAllBoardFiles , (int(max(len(leftAllBoardFiles),len(rightAllBoardFiles))/len(straightAllBoardFiles)) + 1))
-                straightAllMoveFiles = np.tile(straightAllMoveFiles , (int(max(len(leftAllMoveFiles),len(rightAllMoveFiles))/len(straightAllMoveFiles)) + 1)) 
-
-            print("straights in first group: " + str(len(straightAllBoardFiles[0])) + "\t straights in last group: " + str(len(straightAllBoardFiles[-1])))
-            print("amount of straights: " + str(len(straightAllBoardFiles)*len(straightAllBoardFiles[0])) + "\t amount of left: " + str(len(leftAllBoardFiles)) + "\t amount of rights: " + str(len(rightAllBoardFiles)))
- 
-            global_step_start = global_step.eval()
-            for i,((straightBoardFile, straightMoveFile),(leftBoardFile, leftMoveFile),(rightBoardFile, rightMoveFile)) in\
-                enumerate(zip(zip(zip(*straightAllBoardFiles), zip(*straightAllMoveFiles)),\
-                zip(leftAllBoardFiles, leftAllMoveFiles),\
-                zip(rightAllBoardFiles, rightAllMoveFiles))):
+            for i in range(1,amountOfMiniBatchFilesToTrain + 1):
             #if i>70:
                 #starting_learning_rate = 5*1e-5
-                loadDataTime = time.time()
-                batchDataStraight = [\
-                                        np.concatenate([np.load(fileLocation + "trainingData/" + "straight/" + boardFile) for boardFile in straightBoardFile]),\
-                                        np.concatenate([np.load(fileLocation + "trainingData/" + "straight/" + moveFile) for moveFile in straightMoveFile])]
-                
-                batchDataLeft = [np.load(fileLocation + "trainingData/"+ "left/" + leftBoardFile),
-                             np.load(fileLocation + "trainingData/" + "left/" + leftMoveFile)]
-                batchDataRight = [np.load(fileLocation + "trainingData/"+ "right/" + rightBoardFile),
-                             np.load(fileLocation + "trainingData/" + "right/" + rightMoveFile)]
+                batchDataStraight = [np.load(fileLocation + "trainingData/"+ "straight/" + 'trainingDataBoards' + str(i) + ".npy"),
+                             np.load(fileLocation + "trainingData/" + "straight/" + 'trainingDataMoves' + str(i) + ".npy")]
+                batchDataLeft = [np.load(fileLocation + "trainingData/"+ "left/" + 'trainingDataBoards' + str(i) + ".npy"),
+                             np.load(fileLocation + "trainingData/" + "left/" + 'trainingDataMoves' + str(i) + ".npy")]
+                batchDataRight = [np.load(fileLocation + "trainingData/"+ "right/" + 'trainingDataBoards' + str(i) + ".npy"),
+                             np.load(fileLocation + "trainingData/" + "right/" + 'trainingDataMoves' + str(i) + ".npy")]
 
                 dataShuffle = np.array(range(len(batchDataStraight[0]) + len(batchDataLeft[0]) + len(batchDataRight[0])))
                 np.random.shuffle(dataShuffle)
-
-#                print("aaaaaaaaaaaaa" + str(batchDataStraight[1].shape) + " " + str(batchDataLeft[1].shape) + " " +str(batchDataRight[1].shape))
                 batchData = [np.concatenate((batchDataStraight[0] , batchDataLeft[0] , batchDataRight[0]))[dataShuffle] , np.concatenate((batchDataStraight[1] , batchDataLeft[1] , batchDataRight[1]))[dataShuffle]]
 #            for epoch in range(numEpochs):
                 #rearrange = np.array(range(len(batchData[0])))
                 #np.random.shuffle(rearrange)
-                print("minibatch file: " + str(i) + " epoch " + str(epoch) + " started training.\tglobal step is: " + str(global_step.eval()) + "\tlearning rate is: " + str(learning_rate.eval()) + "\ttime passed: " + str(time.time() - startTime))
-                sys.stdout.flush()	
+                print("minibatch file: " + str(i) + " epoch " + str(epoch + 1) + " started training.\tglobal step is: " + str(global_step.eval()) + "\tlearning rate is: " + str(learning_rate) + "\ttime passed: " + str(time.time() - startTime))
+                sys.stdout.flush()
                 # miniBatchGenerator = batchGenerator([batchData[0][rearrange],batchData[1][rearrange]], mini_batch_size)
-                loadDataTime = time.time() - loadDataTime
-                trainStartTime = time.time()
-                gpuTotalTime = 0
                 for miniBatch in batchGenerator(batchData, mini_batch_size):
-                    gpuStartTime = time.time()
                     train_step.run(
                         feed_dict={x: miniBatch[0],
                                    y_: miniBatch[1],
                                    keep_prob: keep_prob_start})#,
 #                                   learning_rate: starting_learning_rate})
-                    gpuTotalTime = gpuTotalTime + (time.time() - gpuStartTime)
-#                writer = tf.summary.FileWriter("/mnt/snake/snakeNN/snakeNN_code/tensorBoard/1")
-#                writer.add_graph(sess.graph)
-#                print("aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa")
-
                     #global_step = global_step + 1
             #print("minibatch file: " + str(i) + " started validation. time passed: "+ str(time.time()-startTime))
-                print ("minibatch file: " + str(i) + " epoch " + str(epoch) + "\tload data time: "  +str(loadDataTime) + "\ttotal train time: " + str(time.time()-trainStartTime) + "\tGPU train time: " + str(gpuTotalTime)) 
-                if (global_step.eval()-global_step_start)%(((20000/mini_batch_size)*(biasRatio+2))*15) == 0 or epoch == numEpochs-1:
+
+                if (global_step.eval())%(120*15) == 0 or epoch == numEpochs-1:
                     print("global step: " + str(global_step.eval()) + " started validation on SLR. time passed: "+ str(time.time()-startTime))
                     sys.stdout.flush()
                     sumOfValidations = 0
@@ -419,7 +330,7 @@ def main(_):
                     sys.stdout.flush()
             
                     now = datetime.datetime.now()
-                    save_path = saver.save(sess, '../models/output_snake_model_' +now.strftime("%Y%m%d_%H%M%S"),global_step=global_step)
+                    save_path = saver.save(sess, 'models/output_snake_model_' +now.strftime("%Y%m%d_%H%M%S"),global_step=global_step)
                     print("Model saved in file: %s" % save_path)
 
         trainEndTime = time.time()
@@ -459,12 +370,9 @@ def main(_):
         # export_path = "/home/student/Desktop/saved_models/model" + str(FLAGS.model_version)#+".ckpt"
    	 #save_path = saver.save(sess, export_path)
         now = datetime.datetime.now()
-        save_path = saver.save(sess, '../models/output_snake_model_final'+now.strftime("%Y%m%d_%H%M%S"))
+        save_path = saver.save(sess, 'models/output_snake_model_final'+now.strftime("%Y%m%d_%H%M%S"))
         print("Model saved in file: %s" % save_path)
         sys.stdout.flush()
-
-        writer = tf.summery.FileWriter("/mnt/snake/snakeNN/snakeNN_code/tensorBoard/1")
-        writer.add_graph(sess.graph)
 
 
 if __name__ == '__main__':

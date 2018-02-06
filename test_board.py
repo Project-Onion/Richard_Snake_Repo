@@ -1,7 +1,7 @@
 import numpy as np
 import time
 
-# boards=numpy.load('./snake_json_files/trainingDataBoards.npy')
+#boards=np.load('/home/snake/data/snakeNN/snakeNN_code/presentation/snakeNN_0/trainingDataBoards1.npy')
 
 # def drawBoard(boards, move, num):#indexArray, num):
 # 	row = 0

@@ -26,10 +26,12 @@ timestamp=$(date +%Y%m%d%H%M%S)
 
 #python generator_alexnet_v0_1_1.py| tee logs/generator_alexnet_v0_1_1_$timestamp.log
 
-python generator_splitSLR_v0_1_1.py | tee logs/generator_splitSLR_v0_1_1_$timestamp.log
+python generator_splitSLR_v0_1_1.py | tee ../logs/generator_splitSLR_v0_1_1_$timestamp.log
 
 #python new_alexnet.py | tee logs/new_alexnet_$timestamp.log
 
 #python generator_splitSLR_threading_v0_1_1.py | tee logs/generator_splitSLR_threading_v0_1_1_$timestamp.log
 
 #python generator_splitSLR_timetest_v0_1_1.py | tee logs/generator_splitSLR_timetest_v0_1_1_$timestamp.log 
+
+#python generator_splitSLR_v0_1_1_longTrain.py | tee logs/generator_splitSLR_v0_1_1_longTrain_$timestamp.log

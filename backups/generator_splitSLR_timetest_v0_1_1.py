@@ -58,19 +58,19 @@ def deepnn(x, keep_prob):
          h_pool2 = max_pool_2x2(h_conv2) #now size will be 9x9x64
 
     # Third convolutional layer -- maps 32 feature maps to 64.
-    with tf.name_scope('conv3'):
-         W_conv3 = weight_variable([3, 3, 64, 128]) #feature size 3x3 to have 8x8 image after convolution
-         b_conv3 = bias_variable([128])
-         h_conv3 = tf.nn.relu(conv2d(h_pool2, W_conv3) + b_conv3)
+#    with tf.name_scope('conv3'):
+#         W_conv3 = weight_variable([3, 3, 64, 128]) #feature size 3x3 to have 8x8 image after convolution
+#         b_conv3 = bias_variable([128])
+#         h_conv3 = tf.nn.relu(conv2d(h_pool2, W_conv3) + b_conv3)
 
     # Fully connected layer 1 -- after 2 round of downsampling, our 28x28 image
     # is down to 10x10x64 feature maps -- maps this to 1024 features.
     with tf.name_scope('fc1'):
-        W_fc1 = weight_variable([7 * 7 * 128,4096]) #4096 = first power of 2 larger than 2500 (=50x50), also (8*8*128 = 8192)/2
+        W_fc1 = weight_variable([9 * 9 * 64, 4096]) #4096 = first power of 2 larger than 2500 (=50x50), also (8*8*128 = 8192)/2
         b_fc1 = bias_variable([4096])
 
         # h_pool2_flat = tf.reshape(h_conv2, [-1, 10 * 10 * 64])
-        h_conv3_flat = tf.reshape(h_conv3, [-1, 7 * 7 * 128])
+        h_conv3_flat = tf.reshape(h_pool2, [-1, 9 * 9 * 64])
         h_fc1 = tf.nn.relu(tf.matmul(h_conv3_flat, W_fc1) + b_fc1)
 
     # Dropout - controls the complexity of the model, prevents co-adaptation of
@@ -146,6 +146,12 @@ def batchGenerator(batchData, mini_batch_size): #border different color
                 ]).flatten() for board in batch[0]], \
             batch[1]]
 
+def imageSpliter(batch):
+    return [np.array([\
+                       [pixel if (pixel == 1 or pixel == 2 or pixel == 3) else 0 for pixel in board],\
+                       [pixel if (pixel == 4 or pixel == 5) else 0 for pixel in board],\
+                       [pixel if (pixel == 6 or pixel == 7) else 0 for pixel in board]\
+                       ]).flatten() for board in batch[0]]
 
 def main(_):
     print("\n\n --- STARTING CODE ---")
@@ -158,7 +164,7 @@ def main(_):
     amountOfMiniBatchFilesToTest = 15 #was 2
     starting_learning_rate = 5*1e-4 #5*1e-4  #was 1e-3
     mini_batch_size = 500   #was 500
-    numEpochs = 20 #400
+    numEpochs = 400
     dataFileNumber = 14 #was 3, then 5
     innerFolder = ""
     keep_prob_start = 0.5
@@ -180,12 +186,11 @@ def main(_):
 #    sys.stdout.flush()
 
     global_step = tf.Variable(0, trainable=False)
-    learning_rate = tf.train.exponential_decay(starting_learning_rate, global_step, 1000, 0.98, staircase=True)
+    learning_rate = tf.train.exponential_decay(starting_learning_rate, global_step, 10000, 0.96, staircase=True)
     confusion = np.zeros([3,3])
     with tf.device('/gpu:0'):
-
         # Create the model
-        x = tf.placeholder(tf.float32, [None, 2704*3], name="x")
+        x = tf.placeholder(tf.float32, [None, 2704], name="x")
 
         # Define loss and optimizer
         y_ = tf.placeholder(tf.float32, [None, 3], name="y")
@@ -193,7 +198,7 @@ def main(_):
         keep_prob = tf.placeholder(tf.float32, name="keep_prob")
         # Build the graph for the deep net
         # y_conv, keep_prob, regularizer = deepnn(x) # with l2 regularization
-        y_conv, keep_prob= deepnn(x, keep_prob)
+        y_conv, keep_prob= deepnn(imageSpliter(x), keep_prob)
 
         tf.argmax(y_conv, 1, output_type=tf.int32, name="result_argmax")
 
@@ -347,7 +352,7 @@ def main(_):
                 loadDataTime = time.time() - loadDataTime
                 trainStartTime = time.time()
                 gpuTotalTime = 0
-                for miniBatch in batchGenerator(batchData, mini_batch_size):
+                for j in range(0, batchData, mini_batch_size):
                     gpuStartTime = time.time()
                     train_step.run(
                         feed_dict={x: miniBatch[0],
@@ -355,10 +360,6 @@ def main(_):
                                    keep_prob: keep_prob_start})#,
 #                                   learning_rate: starting_learning_rate})
                     gpuTotalTime = gpuTotalTime + (time.time() - gpuStartTime)
-#                writer = tf.summary.FileWriter("/mnt/snake/snakeNN/snakeNN_code/tensorBoard/1")
-#                writer.add_graph(sess.graph)
-#                print("aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa")
-
                     #global_step = global_step + 1
             #print("minibatch file: " + str(i) + " started validation. time passed: "+ str(time.time()-startTime))
                 print ("minibatch file: " + str(i) + " epoch " + str(epoch) + "\tload data time: "  +str(loadDataTime) + "\ttotal train time: " + str(time.time()-trainStartTime) + "\tGPU train time: " + str(gpuTotalTime)) 
@@ -419,7 +420,7 @@ def main(_):
                     sys.stdout.flush()
             
                     now = datetime.datetime.now()
-                    save_path = saver.save(sess, '../models/output_snake_model_' +now.strftime("%Y%m%d_%H%M%S"),global_step=global_step)
+                    save_path = saver.save(sess, 'models/output_snake_model_' +now.strftime("%Y%m%d_%H%M%S"),global_step=global_step)
                     print("Model saved in file: %s" % save_path)
 
         trainEndTime = time.time()
@@ -459,12 +460,9 @@ def main(_):
         # export_path = "/home/student/Desktop/saved_models/model" + str(FLAGS.model_version)#+".ckpt"
    	 #save_path = saver.save(sess, export_path)
         now = datetime.datetime.now()
-        save_path = saver.save(sess, '../models/output_snake_model_final'+now.strftime("%Y%m%d_%H%M%S"))
+        save_path = saver.save(sess, 'models/output_snake_model_final'+now.strftime("%Y%m%d_%H%M%S"))
         print("Model saved in file: %s" % save_path)
         sys.stdout.flush()
-
-        writer = tf.summery.FileWriter("/mnt/snake/snakeNN/snakeNN_code/tensorBoard/1")
-        writer.add_graph(sess.graph)
 
 
 if __name__ == '__main__':
