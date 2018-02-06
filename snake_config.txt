@@ -1,4 +1,0 @@
-#snake_config.txt
-#Comments are allowed in the file, as are blank lines
-
-speed     150
