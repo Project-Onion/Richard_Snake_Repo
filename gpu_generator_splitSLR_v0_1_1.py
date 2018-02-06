@@ -189,12 +189,15 @@ def main(_):
 
         # Create the model
         # x = tf.placeholder(tf.float32, [None, 2704*3], name="x")
-        
 
         # Define loss and optimizer
         # y_ = tf.placeholder(tf.float32, [None, 3], name="y")
 
         tensorBatchData = tf.placeholder(tf.float32, [None, 2704, 3], name="tensorBatchData")
+        currSample = tensorGenerator.make_one_shot_iterator().get_next()
+
+        x = tf.variable(currSample[0], name="x")
+        y_ = tf.variable(currSample[1], name="y")
 
         keep_prob = tf.placeholder(tf.float32, name="keep_prob")
         # Build the graph for the deep net
