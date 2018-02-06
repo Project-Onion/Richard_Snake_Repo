@@ -31,7 +31,7 @@ tf.app.flags.DEFINE_string('work_dir', '/home/student/Desktop/', 'Working direct
 FLAGS = tf.app.flags.FLAGS
 
 
-logFile = open("/mnt/snake/snakeNN/snakeNN_code/server_logs/server_output_" + str(datetime.datetime.now().strftime("%Y%m%d_%H%M%S")) + ".log", 'w')
+logFile = open("/home/vmuser/Desktop/snakeNN/server_logs/server_output_" + str(datetime.datetime.now().strftime("%Y%m%d_%H%M%S")) + ".log", 'w')
 #
 # def deepnn(x):
 #     with tf.name_scope('reshape'):
@@ -175,9 +175,14 @@ with tf.Session(config=config) as sess:
 #    saver = tf.train.import_meta_graph('/mnt/snake/snakeNN/snakeNN_code/models/good_models/SLR_new_generator/20171030_173222/output_snake_model_20171030_173222.meta')
 #    saver.restore(sess, tf.train.latest_checkpoint('/mnt/snake/snakeNN/snakeNN_code/models/good_models/SLR_new_generator/20171030_173222/'))
 
+<<<<<<< HEAD:backups/deep_nn_server.py
     #saver = tf.train.import_meta_graph('/mnt/snake/snakeNN/snakeNN_code/models/output_snake_model_20171119_034434-33600.meta')
     saver = tf.train.import_meta_graph('/mnt/snake/snakeNN/snakeNN_code/models/good_models/v_0_1_1/generator2_SLR/20171111_105632/output_snake_model_20171111_105632.meta')
     saver.restore(sess, tf.train.latest_checkpoint('/mnt/snake/snakeNN/snakeNN_code/models/good_models/v_0_1_1/generator2_SLR/20171111_105632'))
+=======
+    saver = tf.train.import_meta_graph('/home/vmuser/Desktop/snakeNN/models/output_snake_model_20171119_034434-33600.meta')
+    saver.restore(sess, tf.train.latest_checkpoint('/home/vmuser/Desktop/snakeNN/models'))
+>>>>>>> 2144965d9cd23f6d28b1774842e40bf9b717587d:deep_nn_server.py
 
     print("setting up graph variables...")
     graph = tf.get_default_graph()
@@ -188,7 +193,11 @@ with tf.Session(config=config) as sess:
     result_argmax = graph.get_tensor_by_name("result_argmax:0")
 
 
+<<<<<<< HEAD:backups/deep_nn_server.py
     warmUp = np.load("/mnt/snake/snakeNN/snakeNN_data11/validationData/validationDataBoards1.npy")
+=======
+    warmUp = np.load("/home/vmuser/Desktop/snakeNN/trainingDataBoards1.npy")
+>>>>>>> 2144965d9cd23f6d28b1774842e40bf9b717587d:deep_nn_server.py
     warmUp_arr = sess.run(result_argmax, feed_dict={x: boardSplitter(np.array(warmUp[0])),keep_prob: 1.0})
 
     # Making connection
