@@ -11,7 +11,6 @@ import tempfile
 import time
 import sys
 import datetime
-import itertools
 
 import random
 import os
@@ -36,56 +35,147 @@ def deepnn(x, keep_prob):
     with tf.name_scope('reshape'):
         x_image = tf.reshape(x, [-1, 52, 52, 3])
 
-    # First convolutional layer - maps one grayscale image to 32 feature maps.
-    with tf.name_scope('conv1'):
-        W_conv1 = weight_variable([7, 7, 3, 32]) #feature size 7x7 to have 46x46 image after convolution
-        b_conv1 = bias_variable([32]) #32 feature maps - arbitrary - can change
-        h_conv1 = tf.nn.relu(conv2d(x_image, W_conv1) + b_conv1) #uses max function (instead of sigmoid function)
-        # h_conv1 = tf.nn.relu(conv2d(h_fc0_flat, W_conv1) + b_conv1)
+    # First convolutional layer - maps one grayscale image to 96 feature maps.
+    with tf.name_scope('conv1_1'):
+        W_conv1_1 = weight_variable([11, 11, 3, 48]) #feature size 11x11 to have 42x42 image after convolution
+        b_conv1_1 = bias_variable([48]) #96 feature maps - arbitrary - can change
+        h_conv1_1 = tf.nn.relu(conv2d(x_image, W_conv1_1) + b_conv1_1) #uses max function (instead of sigmoid function)
+
+#now 50x50x96
 
     # Pooling layer - downsamples by 2X.
-    with tf.name_scope('pool1'):
-        h_pool1 = max_pool_2x2(h_conv1) #now size will be 23x23x32
+    with tf.name_scope('pool1_1'):
+        h_conv1_1 = tf.nn.local_response_normalization(h_conv1_1)
+        h_pool1_1 = max_pool_2x2(h_conv1_1) #now size will be 21x21x96
 
-    # Second convolutional layer -- maps 32 feature maps to 64.
-    with tf.name_scope('conv2'):
-        W_conv2 = weight_variable([5, 5, 32, 64]) #feature size 5x5 to have 19x19  image after convolution
-        b_conv2 = bias_variable([64])
-        h_conv2 = tf.nn.relu(conv2d(h_pool1, W_conv2) + b_conv2)
-        # h_conv2 = tf.nn.relu(conv2d(h_conv1, W_conv2) + b_conv2)
+#now 25x25x96
+
+    # Second convolutional layer -- maps 96 feature maps to 256.
+    with tf.name_scope('conv2_1'):
+        W_conv2_1 = weight_variable([5, 5, 48, 128]) #feature size 10x10 to have 12x12 image after convolution
+        b_conv2_1 = bias_variable([128])
+        h_conv2_1 = tf.nn.relu(conv2d(h_pool1_1, W_conv2_1) + b_conv2_1)
+
+#now 25x25x256
 
     # Second pooling layer.
-    with tf.name_scope('pool2'):
-         h_pool2 = max_pool_2x2(h_conv2) #now size will be 9x9x64
+    with tf.name_scope('pool2_1'):
+        h_conv2_1 = tf.nn.local_response_normalization(h_conv2_1)
+        h_pool2_1 = max_pool_2x2(h_conv2_1) #now size will be 6x6x256
 
-    # Third convolutional layer -- maps 32 feature maps to 64.
-    with tf.name_scope('conv3'):
-         W_conv3 = weight_variable([3, 3, 64, 128]) #feature size 3x3 to have 8x8 image after convolution
-         b_conv3 = bias_variable([128])
-         h_conv3 = tf.nn.relu(conv2d(h_pool2, W_conv3) + b_conv3)
+#now 12x12x256
+
+    # Third convolutional layer -- maps 256 feature maps to 384.
+    with tf.name_scope('conv3_1'):
+        W_conv3_1 = weight_variable([3, 3, 128, 192]) #feature size 3x3 to have 4x4 image after convolution
+        b_conv3_1 = bias_variable([192])
+        h_conv3_1 = tf.nn.relu(conv2d(h_pool2_1, W_conv3_1) + b_conv3_1)
+
+    # Fourth convolutional layer -- maps 384 feature maps to 384.
+    with tf.name_scope('conv4_1'):
+        W_conv4_1 = weight_variable([3, 3, 192, 192]) #feature size 3x3 to have 2x2 image after convolution
+        b_conv4_1 = bias_variable([192])
+        h_conv4_1 = tf.nn.relu(conv2d(h_conv3_1, W_conv4_1) + b_conv4_1)
+
+    # Fifth convolutional layer -- maps 32 feature maps to 64.
+    with tf.name_scope('conv5_1'):
+        W_conv5_1 = weight_variable([3, 3, 192, 128]) #feature size 4x4 to have 20x20 image after convolution
+        b_conv5_1 = bias_variable([128])
+        h_conv5_1 = tf.nn.relu(conv2d(h_conv4_1, W_conv5_1) + b_conv5_1)
+
+    # Third pooling layer.
+    with tf.name_scope('pool3_1'):
+        h_pool3_1 = max_pool_2x2(h_conv5_1) #now size will be 10x10x64
+
+
+    # First convolutional layer - maps one grayscale image to 96 feature maps.
+    with tf.name_scope('conv1_2'):
+        W_conv1_2 = weight_variable([11, 11, 3, 48])  # feature size 11x11 to have 42x42 image after convolution
+        b_conv1_2 = bias_variable([48])  # 96 feature maps - arbitrary - can change
+        h_conv1_2 = tf.nn.relu(conv2d(x_image, W_conv1_2) + b_conv1_2)  # uses max function (instead of sigmoid function)
+
+        # now 50x50x96
+
+    # Pooling layer - downsamples by 2X.
+    with tf.name_scope('pool1_2'):
+        h_conv1_2 = tf.nn.local_response_normalization(h_conv1_2)
+        h_pool1_2 = max_pool_2x2(h_conv1_2)  # now size will be 21x21x96
+
+        # now 25x25x96
+
+    # Second convolutional layer -- maps 96 feature maps to 256.
+    with tf.name_scope('conv2_2'):
+        W_conv2_2 = weight_variable([5, 5, 48, 128])  # feature size 10x10 to have 12x12 image after convolution
+        b_conv2_2 = bias_variable([128])
+        h_conv2_2 = tf.nn.relu(conv2d(h_pool1_2, W_conv2_2) + b_conv2_2)
+
+        # now 25x25x256
+
+    # Second pooling layer.
+    with tf.name_scope('pool2_2'):
+        h_conv2_2 = tf.nn.local_response_normalization(h_conv2_2)
+        h_pool2_2 = max_pool_2x2(h_conv2_2)  # now size will be 6x6x256
+
+        # now 12x12x256
+
+    # Third convolutional layer -- maps 256 feature maps to 384.
+    with tf.name_scope('conv3_2'):
+        W_conv3_2 = weight_variable([3, 3, 128, 192])  # feature size 3x3 to have 4x4 image after convolution
+        b_conv3_2 = bias_variable([192])
+        h_conv3_2 = tf.nn.relu(conv2d(h_pool2_2, W_conv3_2) + b_conv3_2)
+
+    # Fourth convolutional layer -- maps 384 feature maps to 384.
+    with tf.name_scope('conv4_2'):
+        W_conv4_2 = weight_variable([3, 3, 192, 192])  # feature size 3x3 to have 2x2 image after convolution
+        b_conv4_2 = bias_variable([192])
+        h_conv4_2 = tf.nn.relu(conv2d(h_conv3_2, W_conv4_2) + b_conv4_2)
+
+    # Fifth convolutional layer -- maps 32 feature maps to 64.
+    with tf.name_scope('conv5_2'):
+        W_conv5_2 = weight_variable([3, 3, 192, 128])  # feature size 4x4 to have 20x20 image after convolution
+        b_conv5_2 = bias_variable([128])
+        h_conv5_2 = tf.nn.relu(conv2d(h_conv4_2, W_conv5_2) + b_conv5_2)
+
+    # Third pooling layer.
+    with tf.name_scope('pool3_2'):
+        h_pool3_2 = max_pool_2x2(h_conv5_2)  # now size will be 10x10x64
+
+        # now 6x6x256
 
     # Fully connected layer 1 -- after 2 round of downsampling, our 28x28 image
     # is down to 10x10x64 feature maps -- maps this to 1024 features.
     with tf.name_scope('fc1'):
-        W_fc1 = weight_variable([7 * 7 * 128,4096]) #4096 = first power of 2 larger than 2500 (=50x50), also (8*8*128 = 8192)/2
+        W_fc1 = weight_variable([7 * 7 * 256, 4096]) #4096 = first power of 2 larger than 2500 (=50x50)
         b_fc1 = bias_variable([4096])
 
         # h_pool2_flat = tf.reshape(h_conv2, [-1, 10 * 10 * 64])
-        h_conv3_flat = tf.reshape(h_conv3, [-1, 7 * 7 * 128])
-        h_fc1 = tf.nn.relu(tf.matmul(h_conv3_flat, W_fc1) + b_fc1)
+        h_master_flat = tf.reshape(tf.concat((h_pool3_1, h_pool3_2), axis=1), [-1, 7 * 7 * 256])
+        h_fc1 = tf.nn.relu(tf.matmul(h_master_flat, W_fc1) + b_fc1)
 
     # Dropout - controls the complexity of the model, prevents co-adaptation of
     # features.
-    with tf.name_scope('dropout'): #maybe add dropout to other layers aswell?
+    with tf.name_scope('dropout1'): #maybe add dropout to other layers aswell?
         h_fc1_drop = tf.nn.dropout(h_fc1, keep_prob)
 
-    # Map the 4096 features to 3 classes, one for each direction
     with tf.name_scope('fc2'):
-        W_fc2 = weight_variable([4096, 3])
-        b_fc2 = bias_variable([3])
+        W_fc2 = weight_variable([4096, 4096]) #4096 = first power of 2 larger than 2500 (=50x50)
+        b_fc2 = bias_variable([4096])
+
+        # h_pool2_flat = tf.reshape(h_conv2, [-1, 10 * 10 * 64])
+        h_fc2 = tf.nn.relu(tf.matmul(h_fc1_drop, W_fc2) + b_fc2)
+
+    # Dropout - controls the complexity of the model, prevents co-adaptation of
+    # features.
+    with tf.name_scope('dropout2'): #maybe add dropout to other layers aswell?
+        h_fc2_drop = tf.nn.dropout(h_fc2, keep_prob)
+
+    # Map the 4096 features to 3 classes, one for each direction
+    with tf.name_scope('fc3'):
+        W_fc3 = weight_variable([4096, 3])
+        b_fc3 = bias_variable([3])
 
         # y_conv = tf.matmul(h_fc1_drop, W_fc2) + b_fc2
-        y_conv = tf.matmul(h_fc1_drop, W_fc2) + b_fc2
+        y_conv = tf.matmul(h_fc2_drop, W_fc3) + b_fc3
 
     #regularizer = tf.nn.l2_loss(W_conv1) + tf.nn.l2_loss(W_conv2) + tf.nn.l2_loss(W_fc1) + tf.nn.l2_loss(W_fc2)
     # regularizer = tf.nn.l2_loss(W_fc0) + tf.nn.l2_loss(W_conv1) + tf.nn.l2_loss(W_conv2) + tf.nn.l2_loss(W_fc1) + tf.nn.l2_loss(W_fc2)
@@ -94,13 +184,13 @@ def deepnn(x, keep_prob):
 
 def conv2d(x, W):
   """conv2d returns a 2d convolution layer with full stride."""
-  return tf.nn.conv2d(x, W, strides=[1, 1, 1, 1], padding='VALID') #VALID = no padding
+  return tf.nn.conv2d(x, W, strides=[1, 1, 1, 1], padding='SAME') #VALID = no padding
 
 
 def max_pool_2x2(x):
   """max_pool_2x2 downsamples a feature map by 2X."""
   return tf.nn.max_pool(x, ksize=[1, 2, 2, 1],
-                        strides=[1, 2, 2, 1], padding='VALID') #VALID = no padding
+                        strides=[1, 2, 2, 1], padding='SAME') #VALID = no padding
 
 def weight_variable(shape):
   """weight_variable generates a weight variable of a given shape."""
@@ -157,9 +247,9 @@ def main(_):
     amountOfMiniBatchFilesToTrain = 50
     amountOfMiniBatchFilesToValidate = 1
     amountOfMiniBatchFilesToTest = 15 #was 2
-    starting_learning_rate = 5*1e-4 #5*1e-4  #was 1e-3
+    starting_learning_rate = 1*1e-6 #5*1e-4  #was 1e-3
     mini_batch_size = 500   #was 500
-    numEpochs = 20 #400
+    numEpochs = 400
     dataFileNumber = 14 #was 3, then 5
     innerFolder = ""
     keep_prob_start = 0.5
@@ -181,24 +271,15 @@ def main(_):
 #    sys.stdout.flush()
 
     global_step = tf.Variable(0, trainable=False)
-    learning_rate = tf.train.exponential_decay(starting_learning_rate, global_step, 1000, 0.98, staircase=True)
+    learning_rate = tf.train.exponential_decay(starting_learning_rate, global_step, 10000, 0.96, staircase=True)
     confusion = np.zeros([3,3])
-
-    tensorGenerator = tf.data.Dataset.from_generator(batchGenerator, tf.float32, tf.TensorShape([None, 2704 * 3, 3]))
-
     with tf.device('/gpu:0'):
 
         # Create the model
-        # x = tf.placeholder(tf.float32, [None, 2704*3], name="x")
+        x = tf.placeholder(tf.float32, [None, 2704*3], name="x")
 
         # Define loss and optimizer
-        # y_ = tf.placeholder(tf.float32, [None, 3], name="y")
-
-        tensorBatchData = tf.placeholder(tf.float32, [None, 2704, 3], name="tensorBatchData")
-        currSample = tensorGenerator.make_one_shot_iterator().get_next()
-
-        x = tf.variable(currSample[0], name="x")
-        y_ = tf.variable(currSample[1], name="y")
+        y_ = tf.placeholder(tf.float32, [None, 3], name="y")
 
         keep_prob = tf.placeholder(tf.float32, name="keep_prob")
         # Build the graph for the deep net
@@ -333,7 +414,6 @@ def main(_):
                 zip(rightAllBoardFiles, rightAllMoveFiles))):
             #if i>70:
                 #starting_learning_rate = 5*1e-5
-                loadDataTime = time.time()
                 batchDataStraight = [\
                                         np.concatenate([np.load(fileLocation + "trainingData/" + "straight/" + boardFile) for boardFile in straightBoardFile]),\
                                         np.concatenate([np.load(fileLocation + "trainingData/" + "straight/" + moveFile) for moveFile in straightMoveFile])]
@@ -351,29 +431,18 @@ def main(_):
 #            for epoch in range(numEpochs):
                 #rearrange = np.array(range(len(batchData[0])))
                 #np.random.shuffle(rearrange)
-                print("minibatch file: " + str(i) + " epoch " + str(epoch) + " started training.\tglobal step is: " + str(global_step.eval()) + "\tlearning rate is: " + str(learning_rate.eval()) + "\ttime passed: " + str(time.time() - startTime))
-                sys.stdout.flush()	
+                print("minibatch file: " + str(i) + " epoch " + str(epoch + 1) + " started training.\tglobal step is: " + str(global_step.eval()) + "\tlearning rate is: " + str(learning_rate.eval()) + "\ttime passed: " + str(time.time() - startTime))
+                sys.stdout.flush()
                 # miniBatchGenerator = batchGenerator([batchData[0][rearrange],batchData[1][rearrange]], mini_batch_size)
-                loadDataTime = time.time() - loadDataTime
-                trainStartTime = time.time()
-                gpuTotalTime = 0
-                train_step.run(feed_dict={tensorBatchData: batchData,
-                                          keep_prob: keep_prob_start})
-#                 for miniBatch in batchGenerator(batchData, mini_batch_size):
-#                     gpuStartTime = time.time()
-#                     train_step.run(
-#                         feed_dict={x: miniBatch[0],
-#                                    y_: miniBatch[1],
-#                                    keep_prob: keep_prob_start})#,
-# #                                   learning_rate: starting_learning_rate})
-#                     gpuTotalTime = gpuTotalTime + (time.time() - gpuStartTime)
-#                writer = tf.summary.FileWriter("/mnt/snake/snakeNN/snakeNN_code/tensorBoard/1")
-#                writer.add_graph(sess.graph)
-#                print("aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa")
-
+                for miniBatch in batchGenerator(batchData, mini_batch_size):
+                    train_step.run(
+                        feed_dict={x: miniBatch[0],
+                                   y_: miniBatch[1],
+                                   keep_prob: keep_prob_start})#,
+#                                   learning_rate: starting_learning_rate})
                     #global_step = global_step + 1
             #print("minibatch file: " + str(i) + " started validation. time passed: "+ str(time.time()-startTime))
-                print ("minibatch file: " + str(i) + " epoch " + str(epoch) + "\tload data time: "  +str(loadDataTime) + "\ttotal train time: " + str(time.time()-trainStartTime) + "\tGPU train time: " + str(gpuTotalTime)) 
+
                 if (global_step.eval()-global_step_start)%(((20000/mini_batch_size)*(biasRatio+2))*15) == 0 or epoch == numEpochs-1:
                     print("global step: " + str(global_step.eval()) + " started validation on SLR. time passed: "+ str(time.time()-startTime))
                     sys.stdout.flush()
@@ -431,7 +500,7 @@ def main(_):
                     sys.stdout.flush()
             
                     now = datetime.datetime.now()
-                    save_path = saver.save(sess, '../models/output_snake_model_' +now.strftime("%Y%m%d_%H%M%S"),global_step=global_step)
+                    save_path = saver.save(sess, 'models/output_snake_model_' +now.strftime("%Y%m%d_%H%M%S"),global_step=global_step)
                     print("Model saved in file: %s" % save_path)
 
         trainEndTime = time.time()
@@ -471,12 +540,9 @@ def main(_):
         # export_path = "/home/student/Desktop/saved_models/model" + str(FLAGS.model_version)#+".ckpt"
    	 #save_path = saver.save(sess, export_path)
         now = datetime.datetime.now()
-        save_path = saver.save(sess, '../models/output_snake_model_final'+now.strftime("%Y%m%d_%H%M%S"))
+        save_path = saver.save(sess, 'models/output_snake_model_final'+now.strftime("%Y%m%d_%H%M%S"))
         print("Model saved in file: %s" % save_path)
         sys.stdout.flush()
-
-        writer = tf.summery.FileWriter("/mnt/snake/snakeNN/snakeNN_code/tensorBoard/1")
-        writer.add_graph(sess.graph)
 
 
 if __name__ == '__main__':
