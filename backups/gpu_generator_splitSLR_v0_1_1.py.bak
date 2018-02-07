@@ -11,6 +11,7 @@ import tempfile
 import time
 import sys
 import datetime
+import itertools
 
 import random
 import os
@@ -182,13 +183,22 @@ def main(_):
     global_step = tf.Variable(0, trainable=False)
     learning_rate = tf.train.exponential_decay(starting_learning_rate, global_step, 1000, 0.98, staircase=True)
     confusion = np.zeros([3,3])
+
+    tensorGenerator = tf.data.Dataset.from_generator(batchGenerator, tf.float32, tf.TensorShape([None, 2704 * 3, 3]))
+
     with tf.device('/gpu:0'):
 
         # Create the model
-        x = tf.placeholder(tf.float32, [None, 2704*3], name="x")
+        # x = tf.placeholder(tf.float32, [None, 2704*3], name="x")
 
         # Define loss and optimizer
-        y_ = tf.placeholder(tf.float32, [None, 3], name="y")
+        # y_ = tf.placeholder(tf.float32, [None, 3], name="y")
+
+        tensorBatchData = tf.placeholder(tf.float32, [None, 2704, 3], name="tensorBatchData")
+        currSample = tensorGenerator.make_one_shot_iterator().get_next()
+
+        x = tf.variable(currSample[0], name="x")
+        y_ = tf.variable(currSample[1], name="y")
 
         keep_prob = tf.placeholder(tf.float32, name="keep_prob")
         # Build the graph for the deep net
@@ -231,8 +241,7 @@ def main(_):
 
     print("\nstarting session")
     # with tf.Session() as sess:
-    gpu_options = tf.GPUOptions(per_process_gpu_memory_fraction=0.2)
-    config = tf.ConfigProto(allow_soft_placement=True, gpu_options=gpu_options)
+    config = tf.ConfigProto(allow_soft_placement=True)
     with tf.Session(config=config) as sess:
         saver = tf.train.Saver()
         sess.run(tf.global_variables_initializer())
@@ -348,14 +357,16 @@ def main(_):
                 loadDataTime = time.time() - loadDataTime
                 trainStartTime = time.time()
                 gpuTotalTime = 0
-                for miniBatch in batchGenerator(batchData, mini_batch_size):
-                    gpuStartTime = time.time()
-                    train_step.run(
-                        feed_dict={x: miniBatch[0],
-                                   y_: miniBatch[1],
-                                   keep_prob: keep_prob_start})#,
-#                                   learning_rate: starting_learning_rate})
-                    gpuTotalTime = gpuTotalTime + (time.time() - gpuStartTime)
+                train_step.run(feed_dict={tensorBatchData: batchData,
+                                          keep_prob: keep_prob_start})
+#                 for miniBatch in batchGenerator(batchData, mini_batch_size):
+#                     gpuStartTime = time.time()
+#                     train_step.run(
+#                         feed_dict={x: miniBatch[0],
+#                                    y_: miniBatch[1],
+#                                    keep_prob: keep_prob_start})#,
+# #                                   learning_rate: starting_learning_rate})
+#                     gpuTotalTime = gpuTotalTime + (time.time() - gpuStartTime)
 #                writer = tf.summary.FileWriter("/mnt/snake/snakeNN/snakeNN_code/tensorBoard/1")
 #                writer.add_graph(sess.graph)
 #                print("aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa")
