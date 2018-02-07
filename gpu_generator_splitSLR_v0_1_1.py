@@ -11,6 +11,8 @@ import tempfile
 import time
 import sys
 import datetime
+import pycuda.driver as cuda
+import pycuda. autoinit
 
 import random
 import os
@@ -348,14 +350,63 @@ def main(_):
                 loadDataTime = time.time() - loadDataTime
                 trainStartTime = time.time()
                 gpuTotalTime = 0
-                for miniBatch in batchGenerator(batchData, mini_batch_size):
+
+                for batchStartIndex in range(0, len(batchData[0]), mini_batch_size):
+                    batchEndIndex = batchStartIndex + min(mini_batch_size, len(batchData[0]) - batchStartIndex)
+                    currBatchBoardsFlat = batchData[0][batchStartIndex:batchEndIndex].flatten()
+                    batchData_gpu = cuda.mem_alloc(currBatchBoardsFlat.nbytes)
+                    cuda.memcpy_htod(batchData_gpu, currBatchBoardsFlat)
+
+                    finalBatchBoards_gpu = cuda.mem_alloc(currBatchBoardsFlat.nbytes * 3)
+                    mod = cuda.SourceModule("""
+                    
+                        __global__ void batchGenerator(float *batchData, float *finalBatch){
+                            int currImage = threadIdx.x;
+                            int firstPixel = threadIdx.y + threadIdx.z*52;
+                            
+                            if((batchData[currImage*2704+firstPixel] == 1) || (batchData[currImage*2704+firstPixel] == 2) || (batchData[currImage*2704+firstPixel] == 3)){
+                                finalBatch[currImage*2704*3+firstPixel] = batchData[currImage*2704+firstPixel];
+                            } else {
+                                finalBatch[currImage*2704*3+firstPixel] = 0;
+                            }
+                            
+                            if((batchData[currImage*2704+firstPixel] == 4) || (batchData[currImage*2704+firstPixel] == 5)){
+                                finalBatch[currImage*2704*3 + 2704 + firstPixel] = batchData[currImage*2704+firstPixel];
+                            } else {
+                                finalBatch[currImage*2704*3 + 2704 + firstPixel] = 0;
+                            }
+                            
+                            if((batchData[currImage*2704+firstPixel] == 6) || (batchData[currImage*2704+firstPixel] == 7)){
+                                finalBatch[currImage*2704*3+ 2704*2 +firstPixel] = batchData[currImage*2704+firstPixel];
+                            } else {
+                                finalBatch[currImage*2704*3+ 2704*2 + firstPixel] = 0;
+                            }
+                        }
+                        """)
+                    generatorFunction = mod.get_function("batchGenerator")
+                    generatorFunction(batchData_gpu, finalBatchBoards_gpu, block=(mini_batch_size,52,52))
+
+                    finalBatchBoards = np.empty_like(np.concatenate(currBatchBoardsFlat,currBatchBoardsFlat,currBatchBoardsFlat))
+
+                    cuda.memcpy_dtoh(finalBatchBoards, finalBatchBoards_gpu)
+                    finalBatchBoards = np.array(np.array(finalBatchBoards).reshape((mini_batch_size, 2704*3)).tolist())
+
                     gpuStartTime = time.time()
                     train_step.run(
-                        feed_dict={x: miniBatch[0],
-                                   y_: miniBatch[1],
-                                   keep_prob: keep_prob_start})#,
-#                                   learning_rate: starting_learning_rate})
+                        feed_dict={x: finalBatchBoards,
+                                   y_: batchData[1][batchStartIndex:batchEndIndex],
+                                   keep_prob: keep_prob_start})
                     gpuTotalTime = gpuTotalTime + (time.time() - gpuStartTime)
+
+#
+#                 for miniBatch in batchGenerator(batchData, mini_batch_size):
+#                     gpuStartTime = time.time()
+#                     train_step.run(
+#                         feed_dict={x: miniBatch[0],
+#                                    y_: miniBatch[1],
+#                                    keep_prob: keep_prob_start})#,
+# #                                   learning_rate: starting_learning_rate})
+#                     gpuTotalTime = gpuTotalTime + (time.time() - gpuStartTime)
 #                writer = tf.summary.FileWriter("/mnt/snake/snakeNN/snakeNN_code/tensorBoard/1")
 #                writer.add_graph(sess.graph)
 #                print("aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa")
@@ -369,7 +420,8 @@ def main(_):
                     sumOfValidations = 0
                     amountOfValidations = 0
                     final_confusion = np.zeros([3,3])
-            # validationMiniBatchGenerator = batchGenerator(validationBatchData, mini_batch_size)
+            # validationMiniBatchGenerator = batchGenerator(validationBatchData, mini_batch_size
+
                     for miniBatch in batchGenerator(validationBatchData, mini_batch_size):
                         validate_accuracy = accuracy.eval(feed_dict={
                             x: miniBatch[0],
