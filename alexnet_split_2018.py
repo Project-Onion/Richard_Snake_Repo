@@ -30,6 +30,8 @@ tf.app.flags.DEFINE_integer("task_index", 0, "Index of task within the job")
 
 FLAGS = tf.app.flags.FLAGS
 
+NUM_OF_BOARDS_IN_FILE = 20000
+
 
 def deepnn(x, keep_prob):
     with tf.name_scope('reshape'):
@@ -254,8 +256,9 @@ def main(_):
     innerFolder = ""
     keep_prob_start = 0.5
     biasRatio = 1
-    biasDecayFreq = 1
-    biasRatioLimit = 4
+    # biasDecayFreq = 1
+    # biasRatioLimit = 4
+    validationFrequency = 15
 
     print("dataFileNumber: " + str(dataFileNumber))
     print("amountOfMiniBatchFilesToTrain: " + str(amountOfMiniBatchFilesToTrain))
@@ -266,8 +269,8 @@ def main(_):
     print ("epochs to be trained: " +str(numEpochs))
     print ("keep_prob_start: " + str(keep_prob_start))
     print ("starting bias ratio: " + str(biasRatio))
-    print ("bias decay frequency: " + str(biasDecayFreq))
-    print ("bias ratio limit: " + str(biasRatioLimit))
+    # print ("bias decay frequency: " + str(biasDecayFreq))
+    # print ("bias ratio limit: " + str(biasRatioLimit))
 #    sys.stdout.flush()
 
     global_step = tf.Variable(0, trainable=False)
@@ -342,17 +345,17 @@ def main(_):
         print ("variables initialized, starting training...\n")
 #        for i in range(1,amountOfMiniBatchFilesToTrain + 1):
         for epoch in range(numEpochs):
-            if(epoch%biasDecayFreq == 0 and epoch !=0 and biasRatio <= biasRatioLimit and biasRatio>=1):
-                if(epoch%4==1):
-                    biasRatio = 2
-                elif(epoch%4==2):
-                    biasRatio = 1
-                elif(epoch%4==3):
-                    biasRatio = 3
-                elif(epoch%4==3):
-                    biasRatio = 4
-
-                print("bias ratio changed to: " + str(biasRatio))
+            # if(epoch%biasDecayFreq == 0 and epoch !=0 and biasRatio <= biasRatioLimit and biasRatio>=1):
+            #     if(epoch%4==1):
+            #         biasRatio = 2
+            #     elif(epoch%4==2):
+            #         biasRatio = 1
+            #     elif(epoch%4==3):
+            #         biasRatio = 3
+            #     elif(epoch%4==3):
+            #         biasRatio = 4
+            #
+            #     print("bias ratio changed to: " + str(biasRatio))
 #		learning_rate = learning_rate/1.5
 
             straightAllFiles = sorted(os.listdir(fileLocation + "trainingData/"+ "straight/"))
@@ -443,7 +446,7 @@ def main(_):
                     #global_step = global_step + 1
             #print("minibatch file: " + str(i) + " started validation. time passed: "+ str(time.time()-startTime))
 
-                if (global_step.eval()-global_step_start)%(((20000/mini_batch_size)*(biasRatio+2))*15) == 0 or epoch == numEpochs-1:
+                if (global_step.eval()-global_step_start)%(((NUM_OF_BOARDS_IN_FILE/mini_batch_size)*(biasRatio+2))*validationFrequency) == 0 or epoch == numEpochs-1:
                     print("global step: " + str(global_step.eval()) + " started validation on SLR. time passed: "+ str(time.time()-startTime))
                     sys.stdout.flush()
                     sumOfValidations = 0
@@ -540,7 +543,7 @@ def main(_):
         # export_path = "/home/student/Desktop/saved_models/model" + str(FLAGS.model_version)#+".ckpt"
    	 #save_path = saver.save(sess, export_path)
         now = datetime.datetime.now()
-        save_path = saver.save(sess, 'models/output_snake_model_final'+now.strftime("%Y%m%d_%H%M%S"))
+        save_path = saver.save(sess, '../models_2018/output_snake_model_final'+now.strftime("%Y%m%d_%H%M%S"))
         print("Model saved in file: %s" % save_path)
         sys.stdout.flush()
 
