@@ -201,15 +201,15 @@ def sphere (winningSnake, board):
 
 if __name__ == "__main__":
     startTime = time.time()
-    # NUMOFFILES = 38586
-    # dataName = "trainingData"
+    NUMOFFILES = 38586
+    dataName = "trainingData"
     # NUMOFFILES = 18083
     # dataName = "validationData"
-    NUMOFFILES = 19216
-    dataName = "testData"
+    # NUMOFFILES = 19216
+    # dataName = "testData"
     dataLocation = "/home/student/Desktop/" + dataName +"/"
     saveLocation = "/home/student/Desktop/" + dataName +"/"
-    dataDirection = ""
+    dataDirection = "right/"
     dataType = 0
 
     MAX_SAVED_STATES = 9999999
@@ -276,54 +276,15 @@ if __name__ == "__main__":
 
                 drawSnakes(snakes)
 
-                # if dataType==0:
-                #     if reliantOnFlag: #currState != 0:
-                #         testMoves.append(findMove(lastSnakes,snakes, lastWinner))
-                #     if insertStateFlag:
-                #         board = np.pad(board, 1, 'constant', constant_values=(brushEnemyBody))  # add border to board for sphering
-                #         #board = sphere(snakes[findWinner(snakes)],board)
-                #         trainBoards.append(board)
-                #         reliantOnFlag = True
-                #     else:
-                #         reliantOnFlag = False
-                #     dataType=1
-                # elif dataType== 1:
-                #     if reliantOnFlag: #currState != 0:
-                #         trainMoves.append(findMove(lastSnakes,snakes, lastWinner))
-                #     if insertStateFlag:
-                #         board = np.pad(board, 1, 'constant', constant_values=(brushEnemyBody))  # add border to board for sphering
-                #         # board = sphere(snakes[findWinner(snakes)],board)
-                #         validBoards.append(board)
-                #         reliantOnFlag = True
-                #     else:
-                #         reliantOnFlag = False
-                #     dataType=2
-                # elif dataType== 2:
-                #     if reliantOnFlag: #currState != 0:
-                #         validMoves.append(findMove(lastSnakes,snakes, lastWinner))
-                #     if insertStateFlag:
-                #         board = np.pad(board, 1, 'constant', constant_values=(brushEnemyBody))  # add border to board for sphering
-                #         # board = sphere(snakes[findWinner(snakes)],board)
-                #         testBoards.append(board)
-                #         reliantOnFlag = True
-                #     else:
-                #         reliantOnFlag = False
-                #     dataType=0
-
-                # if currState != 0:
-                #     allMoves.append(findMove(lastSnakes,snakes, lastWinner))
-                # board = np.pad(board, 1, 'constant',constant_values=(brushEnemyBody))  # add border to board for sphering
-                # # board = sphere(snakes[findWinner(snakes)], board)
-                # allBoards.append(board)
 
                 if reliantOnFlag:  # currState != 0:
-                    if findMove(lastSnakes, snakes, lastWinner)[1] == 1  and numStraight <= MAX_SAVED_STATES and (learntStateCount%3 == 0):
+                    if (dataDirection == "straight/" or dataDirection == "") and findMove(lastSnakes, snakes, lastWinner)[1] == 1  and numStraight <= MAX_SAVED_STATES and (dataDirection == "straight" or learntStateCount%3 == 0):
                         allMoves.append(findMove(lastSnakes, snakes, lastWinner))
                         numStraight = numStraight + 1
-                    elif findMove(lastSnakes, snakes, lastWinner)[2] == 1  and numRight <= MAX_SAVED_STATES and (learntStateCount%3 == 1):
+                    elif (dataDirection == "right/" or dataDirection == "") and findMove(lastSnakes, snakes, lastWinner)[2] == 1  and numRight <= MAX_SAVED_STATES and (dataDirection == "right" or learntStateCount%3 == 1):
                         allMoves.append(findMove(lastSnakes, snakes, lastWinner))
                         numRight = numRight + 1
-                    elif findMove(lastSnakes, snakes, lastWinner)[0] == 1  and numLeft <= MAX_SAVED_STATES and (learntStateCount%3 == 2):
+                    elif (dataDirection == "left/" or dataDirection == "") and findMove(lastSnakes, snakes, lastWinner)[0] == 1  and numLeft <= MAX_SAVED_STATES and (dataDirection == "left" or learntStateCount%3 == 2):
                         allMoves.append(findMove(lastSnakes, snakes, lastWinner))
                         numLeft = numLeft + 1
                     else:
@@ -343,9 +304,9 @@ if __name__ == "__main__":
                         np.save(saveLocation +dataDirection+ dataName + 'Moves' + str(learntStateCount/20000), numpyMoves)
                         allBoards = []
                         allMoves = []
-                    board = np.pad(board, 1, 'constant', constant_values=(brushBorder))  # add border to board for sphering
-                    board = sphere(snakes[findWinner(snakes)],board)
-                    # allBoards.append(board)
+                    #board = np.pad(board, 1, 'constant', constant_values=(brushBorder))  # add border to board for sphering
+                    #board = sphere(snakes[findWinner(snakes)],board)
+
                     flattened_board = np.array(board).flatten()
                     allBoards.append(flattened_board)
                     reliantOnFlag = True
